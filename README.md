@@ -1,3 +1,13 @@
 # drilldown
 
-Here we go..
+Installation:
+
+```
+npm install
+```
+
+Run (port 3000):
+
+```
+./bin/www
+```
