@@ -30,7 +30,7 @@ Watch for changes and build automatically by running the default task:
 
 ```
 gulp
-``
+```
 
 ## Run
 
