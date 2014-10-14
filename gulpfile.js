@@ -8,7 +8,7 @@ var stylus = require('gulp-stylus');
 
 var paths = {
     style: ['./src/style/*.styl'],
-    jsx: ['./src/jsx/app.js'],
+    jsx: ['./src/js/app.js'],
 };
 
 gulp.task('clean-js', function(cb) {
