@@ -8,7 +8,8 @@ var stylus = require('gulp-stylus');
 
 var paths = {
     style: ['./src/style/*.styl'],
-    jsx: ['./src/js/app.js'],
+    js_app: ['./src/js/app.js'],
+    js: ['./src/js/*.js'],
 };
 
 gulp.task('clean-js', function(cb) {
@@ -26,7 +27,7 @@ gulp.task('css', ['clean-css'], function() {
 });
 
 gulp.task('js', ['clean-js'], function() {
-    browserify({entries: paths.jsx})
+    browserify({entries: paths.js_app})
         .transform(reactify)
         .bundle()
         .pipe(source('bundle.js'))
@@ -35,7 +36,7 @@ gulp.task('js', ['clean-js'], function() {
 
 gulp.task('watch', function() {
     gulp.watch(paths.style, ['css']);
-    gulp.watch(paths.jsx, ['js']);
+    gulp.watch(paths.js, ['js']);
 });
 
 gulp.task('default', ['watch', 'css', 'js']);

@@ -1,163 +1,190 @@
 // Test data
 exports.data = [
     {
-        "City":"Shanghai",
-        "Population":"24150000",
-        "Definition":"Direct-controlled municipality",
-        "Total_Area_km_":"6340.5",
-        "Population_density_km_":"3809",
-        "Country":"China"
+        "city":"Shanghai",
+        "population":"24150000",
+        "definition":"Direct-controlled municipality",
+        "area_km2":"6340.5",
+        "density_km2":"3809",
+        "country":"China"
     },
     {
-        "City":"Karachi",
-        "Population":"23500000",
-        "Definition":"City District Government",
-        "Total_Area_km_":"3527",
-        "Population_density_km_":"6663",
-        "Country":"Pakistan"
+        "city":"Karachi",
+        "population":"23500000",
+        "definition":"city District Government",
+        "area_km2":"3527",
+        "density_km2":"6663",
+        "country":"Pakistan"
     },
     {
-        "City":"Beijing",
-        "Population":"21150000",
-        "Definition":"Direct-controlled municipality",
-        "Total_Area_km_":"16410.54",
-        "Population_density_km_":"1289",
-        "Country":"China"
+        "city":"Beijing",
+        "population":"21150000",
+        "definition":"Direct-controlled municipality",
+        "area_km2":"16410.54",
+        "density_km2":"1289",
+        "country":"China"
     },
     {
-        "City":"Delhi",
-        "Population":"17838842",
-        "Definition":"National Capital Region",
-        "Total_Area_km_":"1484.0",
-        "Population_density_km_":"7845.9",
-        "Country":"India"
+        "city":"Delhi",
+        "population":"17838842",
+        "definition":"National Capital Region",
+        "area_km2":"1484.0",
+        "density_km2":"7845.9",
+        "country":"India"
     },
     {
-        "City":"Lagos",
-        "Population":"17060307",
-        "Definition":"Metropolitan city",
-        "Total_Area_km_":"999.58",
-        "Population_density_km_":"17068",
-        "Country":"Nigeria"
+        "city":"Lagos",
+        "population":"17060307",
+        "definition":"Metropolitan city",
+        "area_km2":"999.58",
+        "density_km2":"17068",
+        "country":"Nigeria"
     },
     {
-        "City":"Istanbul",
-        "Population":"14160467",
-        "Definition":"Metropolitan Municipality-Province",
-        "Total_Area_km_":"2189.79",
-        "Population_density_km_":"6467",
-        "Country":"Turkey"
+        "city":"Istanbul",
+        "population":"14160467",
+        "definition":"Metropolitan Municipality-Province",
+        "area_km2":"2189.79",
+        "density_km2":"6467",
+        "country":"Turkey"
     },
     {
-        "City":"Guangzhou",
-        "Population":"12700800",
-        "Definition":"Sub-Provincial City",
-        "Total_Area_km_":"3843.43",
-        "Population_density_km_":"3305",
-        "Country":"China"
+        "city":"Guangzhou",
+        "population":"12700800",
+        "definition":"Sub-Provincial city",
+        "area_km2":"3843.43",
+        "density_km2":"3305",
+        "country":"China"
     },
     {
-        "City":"Mumbai",
-        "Population":"12655220",
-        "Definition":"Municipal Corporation",
-        "Total_Area_km_":"603.4",
-        "Population_density_km_":"20680",
-        "Country":"India"
+        "city":"Mumbai",
+        "population":"12655220",
+        "definition":"Municipal Corporation",
+        "area_km2":"603.4",
+        "density_km2":"20680",
+        "country":"India"
     },
     {
-        "City":"Moscow",
-        "Population":"12111194",
-        "Definition":"Federal City",
-        "Total_Area_km_":"2510.12",
-        "Population_density_km_":"4825",
-        "Country":"Russia"
+        "city":"Moscow",
+        "population":"12111194",
+        "definition":"Federal city",
+        "area_km2":"2510.12",
+        "density_km2":"4825",
+        "country":"Russia"
     },
     {
-        "City":"Dhaka",
-        "Population":"12043977",
-        "Definition":"City Corporation",
-        "Total_Area_km_":"302.92",
-        "Population_density_km_":"39760",
-        "Country":"Bangladesh"
+        "city":"Dhaka",
+        "population":"12043977",
+        "definition":"city Corporation",
+        "area_km2":"302.92",
+        "density_km2":"39760",
+        "country":"Bangladesh"
     },
     {
-        "City":"Cairo",
-        "Population":"11922949",
-        "Definition":"Governorate",
-        "Total_Area_km_":"3085.1",
-        "Population_density_km_":"3864",
-        "Country":"Egypt"
+        "city":"Cairo",
+        "population":"11922949",
+        "definition":"Governorate",
+        "area_km2":"3085.1",
+        "density_km2":"3864",
+        "country":"Egypt"
     },
     {
-        "City":"São Paulo",
-        "Population":"11895893",
-        "Definition":"Municipality City",
-        "Total_Area_km_":"1521.11",
-        "Population_density_km_":"7762.3",
-        "Country":"Brazil"
+        "city":"São Paulo",
+        "population":"11895893",
+        "definition":"Municipality city",
+        "area_km2":"1521.11",
+        "density_km2":"7762.3",
+        "country":"Brazil"
     },
     {
-        "City":"Lahore",
-        "Population":"11318745",
-        "Definition":"City District",
-        "Total_Area_km_":"1772",
-        "Population_density_km_":"3566",
-        "Country":"Pakistan"
+        "city":"Lahore",
+        "population":"11318745",
+        "definition":"city District",
+        "area_km2":"1772",
+        "density_km2":"3566",
+        "country":"Pakistan"
     },
     {
-        "City":"Shenzhen",
-        "Population":"10467400",
-        "Definition":"Sub-Provincial City",
-        "Total_Area_km_":"1991.64",
-        "Population_density_km_":"5255",
-        "Country":"China"
+        "city":"Shenzhen",
+        "population":"10467400",
+        "definition":"Sub-Provincial city",
+        "area_km2":"1991.64",
+        "density_km2":"5255",
+        "country":"China"
     },
     {
-        "City":"Seoul",
-        "Population":"10388055",
-        "Definition":"Special City",
-        "Total_Area_km_":"605.21",
-        "Population_density_km_":"17164",
-        "Country":"South Korea"
+        "city":"Seoul",
+        "population":"10388055",
+        "definition":"Special city",
+        "area_km2":"605.21",
+        "density_km2":"17164",
+        "country":"South Korea"
     },
     {
-        "City":"Bangalore",
-        "Population":"10178146",
-        "Definition":"Municipal Corporation",
-        "Total_Area_km_":"709.5",
-        "Population_density_km_":"11876",
-        "Country":"India"
+        "city":"Bangalore",
+        "population":"10178146",
+        "definition":"Municipal Corporation",
+        "area_km2":"709.5",
+        "density_km2":"11876",
+        "country":"India"
     },
     {
-        "City":"Jakarta",
-        "Population":"9988329",
-        "Definition":"Capital Region - Five Kota",
-        "Total_Area_km_":"664.12",
-        "Population_density_km_":"15040",
-        "Country":"Indonesia"
+        "city":"Jakarta",
+        "population":"9988329",
+        "definition":"Capital Region - Five Kota",
+        "area_km2":"664.12",
+        "density_km2":"15040",
+        "country":"Indonesia"
     },
     {
-        "City":"Kinshasa",
-        "Population":"9735000",
-        "Definition":"Metropolitan Municipality-Province",
-        "Total_Area_km_":"1117.62",
-        "Population_density_km_":"8710",
-        "Country":"Democratic Republic of the Congo"
+        "city":"Kinshasa",
+        "population":"9735000",
+        "definition":"Metropolitan Municipality-Province",
+        "area_km2":"1117.62",
+        "density_km2":"8710",
+        "country":"Democratic Republic of the Congo"
     },
     {
-        "City":"Tianjin",
-        "Population":"9341844",
-        "Definition":"Direct-controlled municipality",
-        "Total_Area_km_":"4037",
-        "Population_density_km_":"2314",
-        "Country":"China"
+        "city":"Tianjin",
+        "population":"9341844",
+        "definition":"Direct-controlled municipality",
+        "area_km2":"4037",
+        "density_km2":"2314",
+        "country":"China"
     },
     {
-        "City":"Tokyo",
-        "Population":"9071577",
-        "Definition":"23 Special Wards (tokubetsu-ku)",
-        "Total_Area_km_":"622.99",
-        "Population_density_km_":"14562",
-        "Country":"Japan"
+        "city":"Tokyo",
+        "population":"9071577",
+        "definition":"23 Special Wards (tokubetsu-ku)",
+        "area_km2":"622.99",
+        "density_km2":"14562",
+        "country":"Japan"
     }
 ];
+
+exports.schema = [
+    {
+        'id': 'city',
+        'name': 'City',
+    },
+    {
+        'id': 'population',
+        'name': 'Population',
+    },
+    {
+        'id': 'definition',
+        'name': 'Definition',
+    },
+    {
+        'id': 'area_km2',
+        'name': 'Area (km&sup2;)',
+    },
+    {
+        'id': 'density_km2',
+        'name': 'Population density (km&sup2;)',
+    },
+    {
+        'id': 'country',
+        'name': 'Country',
+    }
+]
