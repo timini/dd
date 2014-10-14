@@ -11,7 +11,7 @@ exports.data = [
     {
         "city":"Karachi",
         "population":"23500000",
-        "definition":"city District Government",
+        "definition":"City District Government",
         "area_km2":"3527",
         "density_km2":"6663",
         "country":"Pakistan"
@@ -35,7 +35,7 @@ exports.data = [
     {
         "city":"Lagos",
         "population":"17060307",
-        "definition":"Metropolitan city",
+        "definition":"Metropolitan City",
         "area_km2":"999.58",
         "density_km2":"17068",
         "country":"Nigeria"
@@ -51,7 +51,7 @@ exports.data = [
     {
         "city":"Guangzhou",
         "population":"12700800",
-        "definition":"Sub-Provincial city",
+        "definition":"Sub-Provincial City",
         "area_km2":"3843.43",
         "density_km2":"3305",
         "country":"China"
@@ -67,7 +67,7 @@ exports.data = [
     {
         "city":"Moscow",
         "population":"12111194",
-        "definition":"Federal city",
+        "definition":"Federal City",
         "area_km2":"2510.12",
         "density_km2":"4825",
         "country":"Russia"
@@ -75,7 +75,7 @@ exports.data = [
     {
         "city":"Dhaka",
         "population":"12043977",
-        "definition":"city Corporation",
+        "definition":"City Corporation",
         "area_km2":"302.92",
         "density_km2":"39760",
         "country":"Bangladesh"
@@ -91,7 +91,7 @@ exports.data = [
     {
         "city":"São Paulo",
         "population":"11895893",
-        "definition":"Municipality city",
+        "definition":"Municipality City",
         "area_km2":"1521.11",
         "density_km2":"7762.3",
         "country":"Brazil"
@@ -99,7 +99,7 @@ exports.data = [
     {
         "city":"Lahore",
         "population":"11318745",
-        "definition":"city District",
+        "definition":"City District",
         "area_km2":"1772",
         "density_km2":"3566",
         "country":"Pakistan"
@@ -107,7 +107,7 @@ exports.data = [
     {
         "city":"Shenzhen",
         "population":"10467400",
-        "definition":"Sub-Provincial city",
+        "definition":"Sub-Provincial City",
         "area_km2":"1991.64",
         "density_km2":"5255",
         "country":"China"
@@ -115,7 +115,7 @@ exports.data = [
     {
         "city":"Seoul",
         "population":"10388055",
-        "definition":"Special city",
+        "definition":"Special City",
         "area_km2":"605.21",
         "density_km2":"17164",
         "country":"South Korea"
@@ -123,7 +123,6 @@ exports.data = [
     {
         "city":"Bangalore",
         "population":"10178146",
-        "definition":"Municipal Corporation",
         "area_km2":"709.5",
         "density_km2":"11876",
         "country":"India"

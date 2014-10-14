@@ -21,9 +21,25 @@ var Table = React.createClass({
 var DataRow = React.createClass({
     render: function() {
         var row = this.props.schema.map(function(column) {
-            return <td>{this.props.data[column.id]}</td>;
+            var val = this.props.data[column.id];
+            var empty = val===undefined || val===null;
+            return empty ? 
+                <EmptyCell/> : 
+                <Cell value={this.props.data[column.id]}/>
         }, this);
         return <tr>{row}</tr>;
+    }
+});
+
+var Cell = React.createClass({
+    render: function() {
+        return <td>{this.props.value}</td>
+    }
+});
+
+var EmptyCell = React.createClass({
+    render: function() {
+        return <td className="empty">empty</td>
     }
 });
 
