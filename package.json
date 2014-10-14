@@ -11,5 +11,8 @@
     "url": "git@bitbucket.com:warrd/drilldown.git"
   },
   "author": "Nick Ward, Tim Richardson, Senthil Seveelavanan",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.9.7"
+  }
 }
