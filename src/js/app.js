@@ -4,47 +4,42 @@ var React = require('react');
 var $ = require('jquery');
 var cities = require('./cities');
 
-var App = React.createClass({
-  render: function(){
-    return <h3>{this.props.text}</h3>;
- }
-});
-
 var Table = React.createClass({
-  render: function(){
-      return (
-          <table>
-              <thead>
-                  <tr>{header}</tr>
-              </thead>
-              <tbody>
-                  {rows}
-              </tbody>
-          </table>
-      );
-  }
+    render: function() {
+        var colNames = Object.keys(this.props.data[0]);
+        var rows = this.props.data.map(function(row) {
+            return <DataRow colNames={colNames} data={row}/>
+        });
+        return (
+            <table>
+                <thead><HeaderRow colNames={colNames}/></thead>
+                <tbody>{rows}</tbody>
+            </table>
+        );
+    }
 });
 
-var colNames = Object.keys(cities.data[0]);
-
-var header = colNames.map(function(col) {
-    return <th>{col}</th>;
+var DataRow = React.createClass({
+    render: function() {
+        var row = this.props.colNames.map(function(name) {
+            return <td>{this.props.data[name]}</td>;
+        }, this);
+        return <tr>{row}</tr>;
+    }
 });
 
-var rows = cities.data.map(function(x) {
-    return <tr>{row(x)}</tr>
+var HeaderRow = React.createClass({
+    render: function() {
+        var row = this.props.colNames.map(function(name) {
+            return <th>{name}</th>
+        });
+        return <tr>{row}</tr>
+    }
 });
-
-function row(x) {
-    return colNames.map(function(name) {
-        return <td>{x[name]}</td>;
-    });
-}
-
 
 $(function() {
     React.renderComponent(
-        <Table />,
+        <Table data={cities.data}/>,
         document.getElementById("mountNode")
     );
 });
