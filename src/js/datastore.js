@@ -10,13 +10,24 @@ var _schema = cities.schema;
 
 var _filters = {};
 var _sortColumn = null;
-var _sortDescending = false;
+var _sortReversed = false;
 
+/**
+ * Sort the data set. Empty rows are always at the bottom.
+ */
 function sortData(data) {
-  if (!_sortColumn) return data;
-  var sort = R.sortBy(R.compose(R.toLowerCase, R.prop(_sortColumn)));
-  if (_sortDescending) sort = R.compose(R.reverse, sort);
-  return sort(data);
+  var column = R.find(R.where({id: _sortColumn}), _schema);
+  if (!column) return data;
+  var getColumn = R.get(column.id);
+  var sort = R.sortBy(R.compose(
+    column.type==='number' ? parseFloat : R.toLowerCase,
+    getColumn
+  ));
+  if (_sortReversed) sort = R.compose(R.reverse, sort);
+  var isEmpty = function(x) { return x===null || x===undefined };
+  var data = R.partition(R.compose(isEmpty, getColumn), data);
+  var emptyData = data[0], data = data[1];
+  return R.concat(sort(data), emptyData);
 }
 
 function filterData(data) {
@@ -62,9 +73,9 @@ var DataStore = merge(EventEmitter.prototype, {
    * @param {string} column The column used for sorting
    * @param {boolean} descending Sort ascending/descending
    */
-  setSortMethod: function(column, descending) {
-    _sortColumn = column;
-    _sortDescending = descending;
+  setSortMethod: function(sortColumn, sortReversed) {
+    _sortColumn = sortColumn;
+    _sortReversed = sortReversed;
     this._emitChange();
   },
 

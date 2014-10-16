@@ -14,18 +14,6 @@ npm install gulp -g
 
 ## Build
 
-Create js:
-
-```
-gulp js
-```
-
-Create stylesheets:
-
-```
-gulp css
-```
-
 Watch for changes and build automatically by running the default task:
 
 ```

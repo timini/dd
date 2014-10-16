@@ -8,13 +8,13 @@ var cities = require('./cities');
 var Table = require('./table');
 var DataStore = require('./datastore');
 var CategoryFilter = require('./ui').CategoryFilter;
-var FilterWidget = require('./ui').FilterWidget;
+var FilterComponent = require('./ui').FilterComponent;
 
 var App = React.createClass({
   render: function() {
     return (
       <div>
-        <FilterWidget schema={this.props.schema}/>
+        <FilterComponent schema={this.props.schema}/>
         <Table schema={this.props.schema}/>
       </div>
     );
