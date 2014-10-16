@@ -11,9 +11,9 @@ var Table = React.createClass({
     DataStore.removeChangeListener(this.onChange);
   },
   onChange: function() {
-    this.setState(DataStore.getView());
+    this.setState(DataStore.getDataView());
   },
-  getInitialState: DataStore.getView,
+  getInitialState: DataStore.getDataView,
   render: function() {
     var rows = this.state.data.map(function(row) {
       return <DataRow schema={this.props.schema} data={row}/>;

@@ -2,14 +2,19 @@
 
 var React = require('react');
 var $ = require('jquery');
+var R = require('ramda');
+
 var cities = require('./cities');
 var Table = require('./table');
 var DataStore = require('./datastore');
+var CategoryFilter = require('./ui').CategoryFilter;
+var FilterWidget = require('./ui').FilterWidget;
 
 var App = React.createClass({
   render: function() {
     return (
       <div>
+        <FilterWidget schema={this.props.schema}/>
         <Table schema={this.props.schema}/>
       </div>
     );
@@ -21,8 +26,4 @@ $(function() {
     <App schema={cities.schema}/>,
     document.getElementById("mountNode")
   );
-
-  DataStore.setFilter('country', 'China');
-  DataStore.setRangeFilter('area_km2', 3000, 8000);
-  DataStore.setSortMethod('city', true);
 });

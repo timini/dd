@@ -190,6 +190,6 @@ exports.schema = [
     {
         'id': 'country',
         'name': 'Country',
-        'type': 'enum'
+        'type': 'category'
     }
 ]

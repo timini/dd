@@ -14,7 +14,7 @@ var _sortDescending = false;
 
 function sortData(data) {
   if (!_sortColumn) return data;
-  var sort = R.sortBy(R.prop(_sortColumn));
+  var sort = R.sortBy(R.compose(R.toLowerCase, R.prop(_sortColumn)));
   if (_sortDescending) sort = R.compose(R.reverse, sort);
   return sort(data);
 }
@@ -34,8 +34,12 @@ var DataStore = merge(EventEmitter.prototype, {
    * Retrieve the view into the data on the basis of the sorting method and
    * filters set.
    */
-  getView: function() {
+  getDataView: function() {
     return {data: R.pipe(sortData, filterData)(_data)}
+  },
+
+  getAllData: function() {
+    return _data
   },
 
   /**
@@ -85,6 +89,16 @@ var DataStore = merge(EventEmitter.prototype, {
    */
   setRangeFilter: function(column, min, max) {
     var filter = R.and(R.gte(max), R.lte(min));
+    this.setFilter(column, filter);
+  },
+
+  setCategoryFilter: function(column, categories) {
+    if (!categories.length)
+      var filter = R.alwaysTrue;
+    else
+      var filter = function(value) {
+        return R.some(R.eq(value.toLowerCase()), categories);
+      };
     this.setFilter(column, filter);
   },
 
