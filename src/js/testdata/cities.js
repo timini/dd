@@ -1,4 +1,7 @@
 // Test data
+
+var DataTypes = require('../datatypes');
+
 exports.data = [
     {
         "city":"Shanghai",
@@ -165,31 +168,31 @@ exports.schema = [
     {
         'id': 'city',
         'name': 'City',
-        'type': 'string'
+        'type': DataTypes.STRING
     },
     {
         'id': 'population',
         'name': 'Population',
-        'type': 'number'
+        'type': DataTypes.NUMBER
     },
     {
         'id': 'definition',
         'name': 'Definition',
-        'type': 'string'
+        'type': DataTypes.CATEGORY
     },
     {
         'id': 'area_km2',
         'name': 'Area (km^2)',
-        'type': 'number'
+        'type': DataTypes.NUMBER
     },
     {
         'id': 'density_km2',
         'name': 'Population density (km^2)',
-        'type': 'number'
+        'type': DataTypes.NUMBER
     },
     {
         'id': 'country',
         'name': 'Country',
-        'type': 'category'
+        'type': DataTypes.CATEGORY
     }
 ]

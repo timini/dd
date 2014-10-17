@@ -4,6 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
+var DataTypes = require('../datatypes');
 
 var FilterWidget = React.createClass({
 
@@ -16,7 +17,7 @@ var FilterWidget = React.createClass({
   },
 
   componentWillUnmount: function() {
-    DataStore.removeDataListener(this.onDataChange);
+    DataStore.removeSchemaListener(this.onSchemaChange);
   },
 
   onSchemaChange: function() {
@@ -27,7 +28,7 @@ var FilterWidget = React.createClass({
     var els = [];
     this.state.schema.forEach(function(column, i) {
       switch (column.type) {
-        case "category":
+        case DataTypes.CATEGORY:
           var el = <CategoryFilter column={column.id}/>; break;
         default: return;
       }
@@ -44,52 +45,52 @@ var CategoryFilter = React.createClass({
     column: React.PropTypes.string.isRequired,
   },
 
-  componentWillMount: function() {
-    var data = DataStore.getOriginalData();
-    var categories = R.uniq(R.map(R.prop(this.props.column), data));
-    this.setState({categories: categories});
+  getInitialState: function() {
+    var data = R.map(R.get(this.props.column), DataStore.getOriginalData());
+    var state = {};
+    R.uniq(data).forEach(function(category) {
+      if (category) state[category] = false;
+    });
+    return state;
   },
 
-  onChange: function(e) {
+  getSelected: function() {
     categories = [];
-    for (var ref in this.refs) {
-      if (this.refs[ref].isChecked()) categories.push(ref);
+    for (var category in this.state) {
+      if (this.state[category]) categories.push(category);
     }
-    DataStore.setCategoryFilter(this.props.column, categories);
+    return categories;
   },
 
-  render: function() {
-    return (
-      <form className="category-filter" onChange={this.onChange}>
-        {this.state.categories.map(function(category, i) {
-          return (
-            <CategoryCheckbox
-              ref={category.toLowerCase()} key={i} category={category}
-            />
-          );
-        })}
-      </form>
+  handleClick: function(category) {
+    var categoryState = !this.state[category];
+    var selected = this.getSelected();
+    var state = {};
+    state[category] = categoryState;
+    this.setState(state);
+    DataStore.setCategoryFilter(this.props.column, categoryState ?
+      R.append(category, selected) :
+      R.difference(selected, [category])
     );
-  }
-});
-
-var CategoryCheckbox = React.createClass({
-
-  propTypes: {
-    category: React.PropTypes.string.isRequired,
   },
 
-  isChecked: function() {
-    return this.refs.checkbox.getDOMNode().checked;
+  categoryButton: function(category, i) {
+    var boundClick = this.handleClick.bind(this, category);
+    var className = "category-button" +
+      (this.state[category] ? " selected" : "");
+    return (
+      <span key={i} onClick={boundClick} className={className}>
+        {category}
+      </span>
+    );
   },
 
   render: function() {
     return (
-      <div className="category-checkbox">
-        <label>
-          <input type="checkbox" ref="checkbox"/>
-          <span>{this.props.category}</span>
-        </label>
+      <div className="category-filter">
+        {Object.keys(this.state).map(function(category, i) {
+          return this.categoryButton(category, i);
+        }, this)}
       </div>
     );
   }

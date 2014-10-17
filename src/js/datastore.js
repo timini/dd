@@ -137,7 +137,7 @@ var DataStore = merge(EventEmitter.prototype, {
       var filter = R.alwaysTrue;
     else
       var filter = function(value) {
-        return R.some(R.eq(value.toLowerCase()), categories);
+        return R.some(R.eq(value), categories);
       };
     this.setFilter(column, filter);
   },

@@ -1,5 +1,13 @@
 @import url("http://fonts.googleapis.com/css?family=Lato:300")
 
+.no-select
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
 .content h1, h2, h3, h4, h5
     font-family 'Lato' sans-serif
 
@@ -22,14 +30,6 @@ table
     i
         float right
 
-.no-select
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
 table thead tr
     @extend .no-select
     .table-head
@@ -37,24 +37,26 @@ table thead tr
     .selected-column
         color #50A5C1
 
+table tbody tr:hover
+    background-color #DDF
+    td
+        color darken(#50a5c1, 60%)
 
-.category-checkbox label
+.category-button
     @extend .no-select
-    margin 4px;
-    background-color #EFEFEF;
-    border-radius 4px;
-    border:1px solid #D0D0D0;
-    overflow auto;
-    float left
-    span
-        text-align center;
-        padding:3px 0px;
-        display block;
-        padding-left 1.1em
-        padding-right 1.1em
-    input
-        position absolute;
-        top -20px;
-    input:checked + span
+    cursor pointer
+    font-size 0.9em
+    margin 2px
+    padding 3px 8px
+    background-color #F6F6F6;
+    border:1px solid #EEE;
+    display inline-block
+    margin-left 0px
+    margin-right 6px
+    margin-bottom 6px
+    &.selected
         background-color #50A5C1
         color #fff;
+    &:hover:not(.selected)
+        background-color #DDF
+        color #333;
