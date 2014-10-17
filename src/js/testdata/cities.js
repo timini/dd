@@ -179,12 +179,12 @@ exports.schema = [
     },
     {
         'id': 'area_km2',
-        'name': 'Area (km&sup2;)',
+        'name': 'Area (km^2)',
         'type': 'number'
     },
     {
         'id': 'density_km2',
-        'name': 'Population density (km&sup2;)',
+        'name': 'Population density (km^2)',
         'type': 'number'
     },
     {

@@ -2,33 +2,45 @@
 
 var React = require('react');
 var R = require('ramda');
-var DataStore = require('./datastore');
+
+var DataStore = require('../datastore');
 
 var Table = React.createClass({
 
+  getInitialState: function() {
+    return {
+      data: DataStore.getDataView(),
+      schema: DataStore.getSchema()
+    };
+  },
+
   componentDidMount: function() {
-    DataStore.addChangeListener(this.onChange);
-    this.onChange(); // check for data updates on initialisation
+    DataStore.addDataListener(this.onDataChange);
+    DataStore.addSchemaListener(this.onSchemaChange);
   },
 
   componentWillUnmount: function() {
-    DataStore.removeChangeListener(this.onChange);
+    DataStore.removeDataListener(this.onDataChange);
+    DataStore.addSchemaListener(this.onSchemaChange);
   },
 
-  onChange: function() {
-    this.setState(DataStore.getDataView());
+  onDataChange: function() {
+    this.setState({data: DataStore.getDataView()});
   },
 
-  getInitialState: DataStore.getDataView,
+  onSchemaChange: function() {
+    this.setState({schema: DataStore.getSchema()});
+  },
 
   render: function() {
-    var rows = this.state.data.map(function(row) {
-      return <DataRow schema={this.props.schema} data={row}/>;
-    }, this);
     return (
       <table>
-        <thead><HeaderRow schema={this.props.schema}/></thead>
-        <tbody>{rows}</tbody>
+        <thead><HeaderRow schema={this.state.schema}/></thead>
+        <tbody>
+          {this.state.data.map(function(row, i) {
+            return <DataRow key={i} schema={this.state.schema} data={row}/>;
+          }, this)}
+        </tbody>
       </table>
     );
   }
@@ -36,8 +48,16 @@ var Table = React.createClass({
 
 var HeaderRow = React.createClass({
 
-  setSortMethod: function(selectedColumn, columnIsReversed) {
-    DataStore.setSortMethod(selectedColumn, columnIsReversed);
+  propTypes: {
+    schema: React.PropTypes.array.isRequired,
+  },
+
+  getInitialState: function() {
+    var selectedColumn = DataStore.getSortColumn();
+    return {
+      selectedColumn: selectedColumn,
+      reversedColumns: DataStore.getSortReversed() ? [selectedColumn] : []
+    };
   },
 
   columnIsSelected: function(column) {
@@ -68,29 +88,18 @@ var HeaderRow = React.createClass({
       var columnIsReversed = this.selectColumn(column);
     else
       var columnIsReversed = this.reverseColumnDirection(column);
-    this.setSortMethod(column, columnIsReversed);
-  },
-
-  getInitialState: function() {
-    // TODO: should check there is at least one column
-    var selectedColumn = this.props.schema[0].id;
-    return { selectedColumn: selectedColumn, reversedColumns: [] };
-  },
-
-  componentDidMount: function() {
-    var selectedColumn = this.state.selectedColumn;
-    this.setSortMethod(selectedColumn, this.columnIsReversed(selectedColumn));
+    DataStore.setSortMethod(column, columnIsReversed);
   },
 
   render: function() {
-    var row = this.props.schema.map(function(column) {
+    var row = this.props.schema.map(function(column, i) {
       var boundClick = this.handleClick.bind(this, column.id);
       var tableClass = 'table-head' + 
         (this.columnIsSelected(column.id) ? ' selected-column' : '');
       var arrowClass = "fa " +
         (this.columnIsReversed(column.id) ? 'fa-arrow-down' : 'fa-arrow-up');
       return (
-        <th onClick={boundClick}>
+        <th key={i} onClick={boundClick}>
           <div className={tableClass}>
             {column.name}<i className={arrowClass}/>
           </div>
@@ -103,15 +112,23 @@ var HeaderRow = React.createClass({
 
 var DataRow = React.createClass({
 
+  propTypes: {
+    schema: React.PropTypes.array.isRequired,
+    data: React.PropTypes.object.isRequired
+  },
+
   render: function() {
-    var row = this.props.schema.map(function(column) {
-      var val = this.props.data[column.id];
-      var empty = val===undefined || val===null;
-      return empty ? 
-        <td className="empty">no data</td> :
-        <td>{this.props.data[column.id]}</td>
-    }, this);
-    return <tr>{row}</tr>;
+    return (
+      <tr>
+        {this.props.schema.map(function(column, i) {
+          var val = this.props.data[column.id];
+          var empty = val===undefined || val===null;
+          return empty ? 
+            <td key={i} className="empty">no data</td> :
+            <td key={i}>{this.props.data[column.id]}</td>
+        }, this)}
+      </tr>
+    );
   }
 });
 

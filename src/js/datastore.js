@@ -1,13 +1,12 @@
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 var R = require('ramda');
-var cities = require('./cities');
 
-var CHANGE_EVENT = 'change';
+var DATA_CHANGE_EVENT = 'data-change';
+var SCHEMA_CHANGE_EVENT = 'schema-change';
 
-var _data = cities.data;
-var _schema = cities.schema;
-
+var _data = null;
+var _schema = null;
 var _filters = {};
 var _sortColumn = null;
 var _sortReversed = false;
@@ -37,34 +36,57 @@ function filterData(data) {
 
 var DataStore = merge(EventEmitter.prototype, {
 
-  _emitChange: function() {
-    this.emit(CHANGE_EVENT);
-  },
+  /*
+   * Triggers event upon change in the data view
+   */
+  _emitDataChange: function() { this.emit(DATA_CHANGE_EVENT); },
+
+  /*
+   * Triggers event upon change in the schema
+   */
+  _emitSchemaChange: function() { this.emit(SCHEMA_CHANGE_EVENT); },
 
   /**
    * Retrieve the view into the data on the basis of the sorting method and
    * filters set.
    */
-  getDataView: function() {
-    return {data: R.pipe(sortData, filterData)(_data)}
-  },
+  getDataView: function() { return R.pipe(sortData, filterData)(_data); },
 
-  getAllData: function() {
-    return _data
+  getOriginalData: function() { return _data; },
+
+  getSchema: function() { return _schema; },
+
+  getSortColumn: function () { return _sortColumn; },
+
+  getSortReversed: function () { return _sortReversed; },
+
+
+  /**
+   * @param {function} callback
+   */
+  addDataListener: function(callback) {
+    this.on(DATA_CHANGE_EVENT, callback);
   },
 
   /**
    * @param {function} callback
    */
-  addChangeListener: function(callback) {
-    this.on(CHANGE_EVENT, callback);
+  removeDataListener: function(callback) {
+    this.removeListener(DATA_CHANGE_EVENT, callback);
   },
 
   /**
    * @param {function} callback
    */
-  removeChangeListener: function(callback) {
-    this.removeListener(CHANGE_EVENT, callback);
+  addSchemaListener: function(callback) {
+    this.on(SCHEMA_CHANGE_EVENT, callback);
+  },
+
+  /**
+   * @param {function} callback
+   */
+  removeSchemaListener: function(callback) {
+    this.removeListener(SCHEMA_CHANGE_EVENT, callback);
   },
 
   /**
@@ -76,7 +98,7 @@ var DataStore = merge(EventEmitter.prototype, {
   setSortMethod: function(sortColumn, sortReversed) {
     _sortColumn = sortColumn;
     _sortReversed = sortReversed;
-    this._emitChange();
+    this._emitDataChange();
   },
 
   /**
@@ -88,7 +110,7 @@ var DataStore = merge(EventEmitter.prototype, {
    */
   setFilter: function(column, filter) {
     _filters[column] = filter;
-    this._emitChange();
+    this._emitDataChange();
   },
 
   /**
@@ -103,6 +125,13 @@ var DataStore = merge(EventEmitter.prototype, {
     this.setFilter(column, filter);
   },
 
+  /**
+   * Set a filter for categorical columns.
+   *
+   * @param {string} column
+   * @param {array} Array of strings with categories to retain. If empty,
+   *  display all.
+   */
   setCategoryFilter: function(column, categories) {
     if (!categories.length)
       var filter = R.alwaysTrue;
@@ -129,5 +158,15 @@ var DataStore = merge(EventEmitter.prototype, {
     _filters = {};
   }
 });
+
+function loadTestData() {
+  var cities = require('./testdata/cities');
+  _data = cities.data;
+  _schema = cities.schema;
+  _sortColumn = 'population';
+  _sortReversed = true;
+}
+
+loadTestData();
 
 module.exports = DataStore;
