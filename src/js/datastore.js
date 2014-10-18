@@ -2,6 +2,8 @@ var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 var R = require('ramda');
 
+var DataType = require('./datatype');
+
 var DATA_CHANGE_EVENT = 'data-change';
 var SCHEMA_CHANGE_EVENT = 'schema-change';
 
@@ -19,7 +21,7 @@ function sortData(data) {
   if (!column) return data;
   var getColumn = R.get(column.id);
   var sort = R.sortBy(R.compose(
-    column.type==='number' ? parseFloat : R.toLowerCase,
+    column.type===DataType.NUMBER ? parseFloat : R.toLowerCase,
     getColumn
   ));
   if (_sortReversed) sort = R.compose(R.reverse, sort);
@@ -29,9 +31,10 @@ function sortData(data) {
   return R.concat(sort(data), emptyData);
 }
 
-function filterData(data) {
-  if (Object.keys(_filters).length === 0) return data;
-  return R.filter(R.where(_filters), data);
+function filterData(data, ignoreFilters) {
+  var filters = R.omit(ignoreFilters, _filters);
+  if (Object.keys(filters).length === 0) return data;
+  return R.filter(R.where(filters), data);
 }
 
 var DataStore = merge(EventEmitter.prototype, {
@@ -49,8 +52,14 @@ var DataStore = merge(EventEmitter.prototype, {
   /**
    * Retrieve the view into the data on the basis of the sorting method and
    * filters set.
+   *
+   * @param {array} ignoreFilters Optionally pass an array of column names
+   *  refering to the column filters to disregard in the filtering phase.
    */
-  getDataView: function() { return R.pipe(sortData, filterData)(_data); },
+  getDataView: function(ignoreFilters) {
+    var data = filterData(_data, ignoreFilters || []);
+    return sortData(data);
+  },
 
   getOriginalData: function() { return _data; },
 
@@ -109,7 +118,10 @@ var DataStore = merge(EventEmitter.prototype, {
    *    value, in which case an equality check is performed.
    */
   setFilter: function(column, filter) {
-    _filters[column] = filter;
+    if (!filter)
+      this.removeFilter(column);
+    else
+      _filters[column] = filter;
     this._emitDataChange();
   },
 
@@ -133,12 +145,12 @@ var DataStore = merge(EventEmitter.prototype, {
    *  display all.
    */
   setCategoryFilter: function(column, categories) {
-    if (!categories.length)
-      var filter = R.alwaysTrue;
-    else
+    if (categories.length)
       var filter = function(value) {
         return R.some(R.eq(value), categories);
       };
+    else
+      var filter = null
     this.setFilter(column, filter);
   },
 

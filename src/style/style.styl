@@ -45,18 +45,42 @@ table tbody tr:hover
 .category-button
     @extend .no-select
     cursor pointer
-    font-size 0.9em
+    font-size 0.8em
     margin 2px
-    padding 3px 8px
+    padding 2px 6px
     background-color #F6F6F6;
     border:1px solid #EEE;
     display inline-block
     margin-left 0px
     margin-right 6px
     margin-bottom 6px
+    &.not-available
+        cursor default
+        opacity 0.3;
     &.selected
         background-color #50A5C1
         color #fff;
-    &:hover:not(.selected)
+    &:hover:not(.selected):not(.not-available)
         background-color #DDF
         color #333;
+    .category-count
+        opacity 0.5
+
+.row
+    margin-left 0px
+    margin-right 0px
+    max-width none
+
+.tabletrans-enter
+    opacity: 0.01;
+    transition: opacity .5s ease-in;
+
+.tabletrans-enter.tabletrans-enter-active
+    opacity: 1;
+
+.tabletrans-leave
+  opacity: 1;
+  transition: opacity .5s ease-in;
+
+.tabletrans-leave.tabletrans-leave-active
+  opacity: 0.01;

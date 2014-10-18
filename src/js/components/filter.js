@@ -4,7 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
-var DataTypes = require('../datatypes');
+var DataType = require('../datatype');
 
 var FilterWidget = React.createClass({
 
@@ -28,14 +28,18 @@ var FilterWidget = React.createClass({
     var els = [];
     this.state.schema.forEach(function(column, i) {
       switch (column.type) {
-        case DataTypes.CATEGORY:
+        case DataType.CATEGORY:
           var el = <CategoryFilter column={column.id}/>; break;
         default: return;
       }
-      els.push(<dt key={i*2}>{column.name}</dt>)
-      els.push(<dd key={i*2+1}>{el}</dd>);
+      els.push(
+        <div key={i} className="large-6 columns">
+          <h5>{column.name}</h5>
+          {el}
+        </div>
+      );
     });
-    return <dl>{els}</dl>;
+    return <div className="row collapse">{els}</div>;
   },
 });
 
@@ -46,50 +50,76 @@ var CategoryFilter = React.createClass({
   },
 
   getInitialState: function() {
-    var data = R.map(R.get(this.props.column), DataStore.getOriginalData());
-    var state = {};
-    R.uniq(data).forEach(function(category) {
-      if (category) state[category] = false;
-    });
-    return state;
+    var categories = R.map(
+      R.get(this.props.column),
+      DataStore.getOriginalData()
+    );
+    categories = R.uniq(R.filter(
+      function(x) { return x!== null && x!==undefined },
+      categories
+    ));
+    return {categories: categories, selected: [],};
   },
 
-  getSelected: function() {
-    categories = [];
-    for (var category in this.state) {
-      if (this.state[category]) categories.push(category);
-    }
-    return categories;
+  componentDidMount: function() {
+    DataStore.addDataListener(this.onDataChange);
+  },
+
+  componentWillUnmount: function() {
+    DataStore.addDataListener(this.onDataChange);
+  },
+
+  onDataChange: function() {
+    this.forceUpdate();
+  },
+
+  countCategories: function(categories) {
+    categories = R.map(
+      R.get(this.props.column),
+      DataStore.getDataView([this.props.column])
+    );
+    return R.countBy(R.identity)(categories);
+  },
+
+  toggleSelected: function(category) {
+    if (R.contains(category)(this.state.selected))
+      var selected = R.difference(this.state.selected, [category])
+    else
+      var selected = R.append(category, this.state.selected)
+    this.setState({selected: selected});
+    return selected;
   },
 
   handleClick: function(category) {
-    var categoryState = !this.state[category];
-    var selected = this.getSelected();
-    var state = {};
-    state[category] = categoryState;
-    this.setState(state);
-    DataStore.setCategoryFilter(this.props.column, categoryState ?
-      R.append(category, selected) :
-      R.difference(selected, [category])
+    DataStore.setCategoryFilter(
+      this.props.column,
+      this.toggleSelected(category)
     );
   },
 
-  categoryButton: function(category, i) {
-    var boundClick = this.handleClick.bind(this, category);
-    var className = "category-button" +
-      (this.state[category] ? " selected" : "");
+  categoryButton: function(category, count, i) {
+    if (count)
+      var boundClick = this.handleClick.bind(this, category, count);
+    var className = "category-button";
+    if (R.contains(category, this.state.selected)) className += " selected";
+    if (!count) className += " not-available";
     return (
       <span key={i} onClick={boundClick} className={className}>
-        {category}
+        {category} <span className="category-count">{count}</span>
       </span>
     );
   },
 
   render: function() {
+    var count = this.countCategories();
+    var categories = R.reverse(R.sortBy(
+      function(x) { return count[x] || 0; },
+      this.state.categories
+    ));
     return (
       <div className="category-filter">
-        {Object.keys(this.state).map(function(category, i) {
-          return this.categoryButton(category, i);
+        {categories.map(function(category, i) {
+          return this.categoryButton(category, count[category] || 0, i);
         }, this)}
       </div>
     );
