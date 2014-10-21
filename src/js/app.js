@@ -6,7 +6,7 @@ var R = require('ramda');
 
 var DataStore = require('./datastore');
 var Table = require('./components/table');
-var FilterWidget = require('./components/filter');
+var FilterWidget = require('./components/filterwidget');
 
 var App = React.createClass({
 

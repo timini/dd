@@ -6,6 +6,8 @@ var DataType = require('./datatype');
 var ChangeEvent = require('./changeevent');
 var filtering = require('./filtering');
 
+var ITEM_HOVER = 'ITEM_HOVER';
+
 var items = [];
 var schema = [];
 var filters = {};
@@ -13,6 +15,7 @@ var sortKey = null;
 var sortReversed = false;
 var filterDefs = {};
 var highlightFn = null;
+var hoveredItem = null;
 
 var cache = {};
 
@@ -35,7 +38,7 @@ function sortItems(items) {
   return R.concat(sort(items), empty);
 }
 
-function getMeta(items) {
+function getHighlight(items) {
   return items.map(function(item) {
     return {
       data: item.data,
@@ -94,6 +97,14 @@ var DataStore = merge(EventEmitter.prototype, {
     this.applyPipeline(ChangeEvent.HIGHLIGHT);
   },
 
+  // TODO: This event type is maybe beyond the scope of the DataStore object,
+  // should probably be handled by another store.
+  updateItemHover: function(item) {
+    hoveredItem = item;
+    this.emit(ITEM_HOVER, item);
+  },
+
+
   /**
    * Apply the pipeline and notify all listeners. Optionally specify a
    * ChangeEvent type, so that cached data before a specific point in the event
@@ -119,7 +130,7 @@ var DataStore = merge(EventEmitter.prototype, {
       case SORT:
         cache[SORT] = sortItems(cache[FILTER]);
       case HIGHLIGHT:
-        cache[HIGHLIGHT] = getMeta(cache[SORT]);
+        cache[HIGHLIGHT] = getHighlight(cache[SORT]);
     }
     this.emitChange(evt);
   },

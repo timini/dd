@@ -4,45 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
-var DataType = require('../datatype');
 var ChangeEvent = require('../changeevent');
-
-var FilterWidget = React.createClass({
-
-  getInitialState: function() {
-    return {schema: [], items: []}
-  },
-
-  componentDidMount: function() {
-    DataStore.on(ChangeEvent.SCHEMA, this.onChange);
-  },
-
-  componentWillUnmount: function() {
-    DataStore.removeListener(ChangeEvent.SCHEMA, this.onChange);
-  },
-
-  onChange: function(data) {
-    this.setState(data);
-  },
-
-  render: function() {
-    var els = [];
-    this.state.schema.forEach(function(column, i) {
-      switch (column.datatype) {
-        case DataType.CATEGORY:
-          var el = <CategoryFilter key={column.key}/>; break;
-        default: return;
-      }
-      els.push(
-        <div key={i} className="large-6 columns">
-          <h5>{column.name}</h5>
-          {el}
-        </div>
-      );
-    });
-    return <div className="row collapse">{els}</div>;
-  },
-});
 
 var CategoryFilter = React.createClass({
 
@@ -51,15 +13,21 @@ var CategoryFilter = React.createClass({
   },
 
   getInitialState: function() {
-    return {items: []};
+    return {items: [], hoveredItem: null};
   },
 
   componentDidMount: function() {
     DataStore.on(ChangeEvent.FILTER, this.onChange);
+    DataStore.on('ITEM_HOVER', this.onItemHover);
   },
 
   componentWillUnmount: function() {
     DataStore.removeListener(ChangeEvent.FILTER, this.onChange);
+    DataStore.removeListener('ITEM_HOVER', this.onItemHover);
+  },
+
+  onItemHover: function(item) {
+    this.setState({hoveredItem: item});
   },
 
   onChange: function(data) {
@@ -115,11 +83,14 @@ var CategoryFilter = React.createClass({
   },
 
   categoryButton: function(category, count, i) {
+    var isHoveredItem = this.state.hoveredItem &&
+      this.state.hoveredItem.data[this.props.key]==category;
     var boundClick = this.handleClick.bind(this, category);
     var boundEnter = this.handleMouseEnter.bind(this, category);
     var className = "category-button";
     if (this.isSelected(category)) className += " selected";
     if (!count) className += " not-available";
+    if (isHoveredItem) className += " highlight";
     return (
       <span key={i} onClick={boundClick} onMouseEnter={boundEnter} 
           onMouseLeave={this.handleMouseLeave} className={className}>
@@ -145,4 +116,4 @@ var CategoryFilter = React.createClass({
   }
 });
 
-module.exports = FilterWidget;
+module.exports = CategoryFilter;

@@ -30,6 +30,7 @@ td.empty
 
 table
     width 100%
+    cursor default
     i
         float right
 
@@ -41,6 +42,11 @@ table thead tr
         color #50A5C1
 
 table tbody tr.highlight
+    background-color #DDF
+    td
+        color darken(#50a5c1, 60%)
+
+table tbody tr:hover
     background-color #DDF
     td
         color darken(#50a5c1, 60%)
@@ -67,3 +73,6 @@ table tbody tr.highlight
         color #333;
     .category-count
         opacity 0.5
+    &.highlight
+        background-color #DDF
+        color #333;

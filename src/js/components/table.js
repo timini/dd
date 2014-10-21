@@ -128,6 +128,14 @@ var Row = React.createClass({
       <td key={i}>{val}</td>;
   },
 
+  onMouseEnter: function() {
+    DataStore.updateItemHover(this.props.item);
+  },
+
+  onMouseLeave: function() {
+    DataStore.updateItemHover(null);
+  },
+
   render: function() {
     var item = this.props.item;
     if (item.filtered)
@@ -135,7 +143,8 @@ var Row = React.createClass({
     else if (item.highlight)
       var className = "highlight";
     return (
-      <tr className={className}>
+      <tr className={className} onMouseEnter={this.onMouseEnter} 
+          onMouseLeave={this.onMouseLeave}>
         {this.props.schema.map(function(field, i) {
           return this.renderCell(field, i);
         }, this)}
