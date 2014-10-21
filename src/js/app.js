@@ -10,10 +10,21 @@ var FilterWidget = require('./components/filter');
 
 var App = React.createClass({
 
+  componentDidMount: function() {
+    loadTestData();
+  },
+
   render: function() {
     return <div><FilterWidget/><Table/></div>;
   }
 });
+
+function loadTestData() {
+  var cities = require('./testdata/cities');
+  DataStore.load(cities.schema, cities.items, 'population', true);
+}
+
+loadTestData();
 
 $(function() {
   React.renderComponent(<App/>, document.getElementById("mountNode"));

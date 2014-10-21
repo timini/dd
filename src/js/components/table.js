@@ -4,100 +4,75 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
+var ChangeEvent = require('../changeevent');
 
 var Table = React.createClass({
-
-  getInitialState: function() {
-    return {
-      data: DataStore.getDataView(),
-      schema: DataStore.getSchema()
-    };
-  },
-
-  componentDidMount: function() {
-    DataStore.addDataListener(this.onDataChange);
-    DataStore.addSchemaListener(this.onSchemaChange);
-  },
-
-  componentWillUnmount: function() {
-    DataStore.removeDataListener(this.onDataChange);
-    DataStore.addSchemaListener(this.onSchemaChange);
-  },
-
-  onDataChange: function() {
-    this.setState({data: DataStore.getDataView()});
-  },
-
-  onSchemaChange: function() {
-    this.setState({schema: DataStore.getSchema()});
-  },
 
   render: function() {
     return (
       <table>
-        <thead><HeaderRow schema={this.state.schema}/></thead>
-        <tbody>
-          {this.state.data.map(function(row, i) {
-            return <DataRow key={i} schema={this.state.schema} data={row}/>;
-          }, this)}
-        </tbody>
+        <TableHeader/>
+        <TableData/>
       </table>
     );
   }
 });
 
-var HeaderRow = React.createClass({
-
-  propTypes: {
-    schema: React.PropTypes.array.isRequired,
-  },
+var TableHeader = React.createClass({
 
   getInitialState: function() {
-    var selectedColumn = DataStore.getSortColumn();
     return {
-      selectedColumn: selectedColumn,
-      reversedColumns: DataStore.getSortReversed() ? [selectedColumn] : []
+      sortKey: null,
+      schema: [],
+      reversedColumns: []
     };
   },
 
+  componentDidMount: function() {
+    DataStore.on(ChangeEvent.SORT, this.onChange);
+  },
+
+  componentWillUnmount: function() {
+    DataStore.removeListener(ChangeEvent.SORT, this.onChange);
+  },
+
+  onChange: function(data) {
+    if (this.columnIsReversed(data.sortKey) !== data.sortReversed)
+      var reversedColumns = this.reverseColumnDirection(data.sortKey);
+    else
+      var reversedColumns = this.state.reversedColumns;
+    this.setState(R.mixin(data, {reversedColumns: reversedColumns}));
+  },
+
   columnIsSelected: function(column) {
-    return this.state.selectedColumn===column;
+    return this.state.sortKey===column;
   },
 
   columnIsReversed: function(column) {
     return R.contains(column)(this.state.reversedColumns);
   },
 
-  selectColumn: function(column) {
-    this.setState({selectedColumn: column});
-    return this.columnIsReversed(column);
-  },
-
   reverseColumnDirection: function(column) {
-    var columnIsReversed = this.columnIsReversed(column);
-    if (columnIsReversed)
+    if (this.columnIsReversed(column))
       var reversedColumns = R.difference(this.state.reversedColumns, [column]);
     else
       var reversedColumns = R.append(column, this.state.reversedColumns)
-    this.setState({reversedColumns: reversedColumns});
-    return !columnIsReversed;
+    return reversedColumns;
   },
 
   handleClick: function(column) {
-    if (!this.columnIsSelected(column))
-      var columnIsReversed = this.selectColumn(column);
-    else
-      var columnIsReversed = this.reverseColumnDirection(column);
-    DataStore.setSortMethod(column, columnIsReversed);
+    var columnIsReversed = this.columnIsReversed(column);
+    if (this.columnIsSelected(column)) columnIsReversed = !columnIsReversed;
+    DataStore.updateSortMethod(column, columnIsReversed);
   },
 
   render: function() {
-    var row = this.props.schema.map(function(column, i) {
-      var boundClick = this.handleClick.bind(this, column.id);
+    var row = this.state.schema.map(function(column, i) {
+      var boundClick = this.handleClick.bind(this, column.key);
       var tableClass = 'table-head' + 
-        (this.columnIsSelected(column.id) ? ' selected-column' : '');
+        (this.columnIsSelected(column.key) ? ' selected-column' : '');
       var arrowClass = "fa " +
-        (this.columnIsReversed(column.id) ? 'fa-arrow-down' : 'fa-arrow-up');
+        (this.columnIsReversed(column.key) ? 'fa-arrow-down' : 'fa-arrow-up');
       return (
         <th key={i} onClick={boundClick}>
           <div className={tableClass}>
@@ -106,26 +81,63 @@ var HeaderRow = React.createClass({
         </th>
       );
     }, this);
-    return <tr>{row}</tr>;
-  },
+    return <thead><tr>{row}</tr></thead>;
+  }
 });
 
-var DataRow = React.createClass({
+var TableData = React.createClass({
 
-  propTypes: {
-    schema: React.PropTypes.array.isRequired,
-    data: React.PropTypes.object.isRequired
+  getInitialState: function() {
+    return {items: [], schema: []};
+  },
+
+  componentDidMount: function() {
+    DataStore.on(ChangeEvent.HIGHLIGHT, this.onChange);
+  },
+
+  componentWillUnmount: function() {
+    DataStore.removeListener(ChangeEvent.HIGHLIGHT, this.onChange);
+  },
+
+  onChange: function(data) {
+    this.setState(data);
   },
 
   render: function() {
     return (
-      <tr>
-        {this.props.schema.map(function(column, i) {
-          var val = this.props.data[column.id];
-          var empty = val===undefined || val===null;
-          return empty ? 
-            <td key={i} className="empty">no data</td> :
-            <td key={i}>{this.props.data[column.id]}</td>
+      <tbody>
+        {this.state.items.map(function(item, i) {
+          return <Row key={i} schema={this.state.schema} item={item}/>;
+        }, this)}
+      </tbody>
+    );
+  }
+});
+
+var Row = React.createClass({
+
+  propTypes: {
+    schema: React.PropTypes.array.isRequired,
+    item: React.PropTypes.object.isRequired
+  },
+
+  renderCell: function(field, i) {
+    var val = this.props.item.data[field.key];
+    return (val===undefined || val===null) ?
+      <td key={i} className="empty">no data</td> :
+      <td key={i}>{val}</td>;
+  },
+
+  render: function() {
+    var item = this.props.item;
+    if (item.filtered)
+      var className = "hide";
+    else if (item.highlight)
+      var className = "highlight";
+    return (
+      <tr className={className}>
+        {this.props.schema.map(function(field, i) {
+          return this.renderCell(field, i);
         }, this)}
       </tr>
     );

@@ -2,7 +2,7 @@
 
 var DataType = require('../datatype');
 
-exports.data = [
+exports.items = [
     {
         "city":"Shanghai",
         "population":24150000,
@@ -166,33 +166,33 @@ exports.data = [
 
 exports.schema = [
     {
-        'id': 'city',
+        'key': 'city',
         'name': 'City',
-        'type': DataType.STRING
+        'datatype': DataType.STRING
     },
     {
-        'id': 'population',
+        'key': 'population',
         'name': 'Population',
-        'type': DataType.NUMBER
+        'datatype': DataType.NUMBER
     },
     {
-        'id': 'definition',
+        'key': 'definition',
         'name': 'Definition',
-        'type': DataType.CATEGORY
+        'datatype': DataType.CATEGORY
     },
     {
-        'id': 'area_km2',
+        'key': 'area_km2',
         'name': 'Area (km^2)',
-        'type': DataType.NUMBER
+        'datatype': DataType.NUMBER
     },
     {
-        'id': 'density_km2',
+        'key': 'density_km2',
         'name': 'Population density (km^2)',
-        'type': DataType.NUMBER
+        'datatype': DataType.NUMBER
     },
     {
-        'id': 'country',
+        'key': 'country',
         'name': 'Country',
-        'type': DataType.CATEGORY
+        'datatype': DataType.CATEGORY
     }
 ]

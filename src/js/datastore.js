@@ -1,184 +1,154 @@
 var EventEmitter = require('events').EventEmitter;
-var merge = require('react/lib/merge');
 var R = require('ramda');
+var merge = require('react/lib/merge');
 
 var DataType = require('./datatype');
+var ChangeEvent = require('./changeevent');
+var filtering = require('./filtering');
 
-var DATA_CHANGE_EVENT = 'data-change';
-var SCHEMA_CHANGE_EVENT = 'schema-change';
+var items = [];
+var schema = [];
+var filters = {};
+var sortKey = null;
+var sortReversed = false;
+var filterDefs = {};
+var highlightFn = null;
 
-var _data = null;
-var _schema = null;
-var _filters = {};
-var _sortColumn = null;
-var _sortReversed = false;
+var cache = {};
+
 
 /**
- * Sort the data set. Empty rows are always at the bottom.
+ * Sort the data set. Empty values are always placed at the end.
  */
-function sortData(data) {
-  var column = R.find(R.where({id: _sortColumn}), _schema);
-  if (!column) return data;
-  var getColumn = R.get(column.id);
+function sortItems(items) {
+  var column = R.find(R.where({key: sortKey}), schema);
+  if (!column) return items;
+  var getColumn = R.compose(R.get(column.key), R.get("data"));
   var sort = R.sortBy(R.compose(
-    column.type===DataType.NUMBER ? parseFloat : R.toLowerCase,
+    column.datatype===DataType.NUMBER ? parseFloat : R.toLowerCase,
     getColumn
   ));
-  if (_sortReversed) sort = R.compose(R.reverse, sort);
+  if (sortReversed) sort = R.compose(R.reverse, sort);
   var isEmpty = function(x) { return x===null || x===undefined };
-  var data = R.partition(R.compose(isEmpty, getColumn), data);
-  var emptyData = data[0], data = data[1];
-  return R.concat(sort(data), emptyData);
+  items = R.partition(R.compose(isEmpty, getColumn), items);
+  var empty = items[0], items = items[1];
+  return R.concat(sort(items), empty);
 }
 
-function filterData(data, ignoreFilters) {
-  var filters = R.omit(ignoreFilters, _filters);
-  if (Object.keys(filters).length === 0) return data;
-  return R.filter(R.where(filters), data);
+function getMeta(items) {
+  return items.map(function(item) {
+    return {
+      data: item.data,
+      filtered: item.filtered,
+      highlight: highlightFn ? highlightFn(item.data) : false,
+    }
+  });
 }
 
 var DataStore = merge(EventEmitter.prototype, {
 
-  /*
-   * Triggers event upon change in the data view
+  /**
+   * The DataStore object can emit multiple events, which are organised in
+   * a hierarchy: emitting one event will also propagate events lower in the
+   * hierarchy. When listening to events, the highest level possible should
+   * be listened to so that components are not re-rendered unnecessarily.
    */
-  _emitDataChange: function() { this.emit(DATA_CHANGE_EVENT); },
-
-  /*
-   * Triggers event upon change in the schema
-   */
-  _emitSchemaChange: function() { this.emit(SCHEMA_CHANGE_EVENT); },
+  eventHierarchy: [
+    ChangeEvent.SCHEMA,
+    ChangeEvent.DATA,
+    ChangeEvent.FILTER,
+    ChangeEvent.SORT,
+    ChangeEvent.HIGHLIGHT
+  ],
 
   /**
-   * Retrieve the view into the data on the basis of the sorting method and
-   * filters set.
+   * Initialised new a data-set.
+   */
+  load: function(newSchema, newItems, newSortKey, newSortReversed) {
+    schema = newSchema;
+    items = newItems;
+    sortKey = newSortKey || schema[0].key;
+    sortReversed = newSortReversed || false;
+    this.applyPipeline(ChangeEvent.SCHEMA);
+  },
+
+  /**
+   * Specify how the items should be sorted.
    *
-   * @param {array} ignoreFilters Optionally pass an array of column names
-   *  refering to the column filters to disregard in the filtering phase.
-   */
-  getDataView: function(ignoreFilters) {
-    var data = filterData(_data, ignoreFilters || []);
-    return sortData(data);
-  },
-
-  getOriginalData: function() { return _data; },
-
-  getSchema: function() { return _schema; },
-
-  getSortColumn: function () { return _sortColumn; },
-
-  getSortReversed: function () { return _sortReversed; },
-
-
-  /**
-   * @param {function} callback
-   */
-  addDataListener: function(callback) {
-    this.on(DATA_CHANGE_EVENT, callback);
-  },
-
-  /**
-   * @param {function} callback
-   */
-  removeDataListener: function(callback) {
-    this.removeListener(DATA_CHANGE_EVENT, callback);
-  },
-
-  /**
-   * @param {function} callback
-   */
-  addSchemaListener: function(callback) {
-    this.on(SCHEMA_CHANGE_EVENT, callback);
-  },
-
-  /**
-   * @param {function} callback
-   */
-  removeSchemaListener: function(callback) {
-    this.removeListener(SCHEMA_CHANGE_EVENT, callback);
-  },
-
-  /**
-   * Specify how the data should be sorted.
-   *
-   * @param {string} column The column used for sorting
+   * @param {string} key The column used for sorting
    * @param {boolean} descending Sort ascending/descending
    */
-  setSortMethod: function(sortColumn, sortReversed) {
-    _sortColumn = sortColumn;
-    _sortReversed = sortReversed;
-    this._emitDataChange();
+  updateSortMethod: function(key, reversed) {
+    sortKey = key;
+    sortReversed = reversed;
+    this.applyPipeline(ChangeEvent.SORT);
+  },
+
+  updateFilter: function(key, filterDef) {
+    filterDefs[key] = filterDef;
+    this.applyPipeline(ChangeEvent.FILTER);
+  },
+
+  updateHighlight: function(fn) {
+    highlightFn = fn;
+    this.applyPipeline(ChangeEvent.HIGHLIGHT);
   },
 
   /**
-   * Set the filter used for a particular column.
-   *
-   * @param {string} column
-   * @param {function|*} filter Either a predicate function, or some other 
-   *    value, in which case an equality check is performed.
+   * Apply the pipeline and notify all listeners. Optionally specify a
+   * ChangeEvent type, so that cached data before a specific point in the event
+   * hierarchy is not recomputed.
    */
-  setFilter: function(column, filter) {
-    if (!filter)
-      this.removeFilter(column);
-    else
-      _filters[column] = filter;
-    this._emitDataChange();
+  applyPipeline: function(evt) {
+    // TODO: This function re-states the ordering eventHierarchy, and will be 
+    // incorrect if the order changes.
+    var SCHEMA = ChangeEvent.SCHEMA,
+        DATA = ChangeEvent.DATA,
+        FILTER = ChangeEvent.FILTER,
+        SORT = ChangeEvent.SORT,
+        HIGHLIGHT = ChangeEvent.HIGHLIGHT;
+    evt = evt || SCHEMA;
+    switch (evt) {
+      case SCHEMA:
+        null; // Do nothing and continue
+      case DATA:
+        null; // Do nothing and continue
+      case FILTER:
+        var filters = filtering.createFilters(schema, filterDefs);
+        cache[FILTER] = filtering.filterItems(items, filters);
+      case SORT:
+        cache[SORT] = sortItems(cache[FILTER]);
+      case HIGHLIGHT:
+        cache[HIGHLIGHT] = getMeta(cache[SORT]);
+    }
+    this.emitChange(evt);
   },
 
   /**
-   * Set a filter on the basis of numerical range.
-   *
-   * @param {string} column
-   * @param {number} min The minimum permitted value
-   * @param {number} max The maximum permitted value
+   * Retrieve the data (should not be called directly, will be received by
+   * registered listeners upon event propagation)
    */
-  setRangeFilter: function(column, min, max) {
-    var filter = R.and(R.gte(max), R.lte(min));
-    this.setFilter(column, filter);
+  _getData: function() {
+    var pipelineEnd = this.eventHierarchy[this.eventHierarchy.length-1];
+    return {
+      schema: schema,
+      items: cache[pipelineEnd],
+      sortKey: sortKey,
+      sortReversed: sortReversed,
+      filterDefs: filterDefs,
+    };
   },
 
   /**
-   * Set a filter for categorical columns.
-   *
-   * @param {string} column
-   * @param {array} Array of strings with categories to retain. If empty,
-   *  display all.
+   * Emit change event to all listeners. This should not be called directly.
    */
-  setCategoryFilter: function(column, categories) {
-    if (categories.length)
-      var filter = function(value) {
-        return R.some(R.eq(value), categories);
-      };
-    else
-      var filter = null
-    this.setFilter(column, filter);
+  emitChange: function(evt) {
+    var data = this._getData();
+    var idx = R.findIndex(R.eq(evt), this.eventHierarchy);
+    this.eventHierarchy.slice(idx).forEach(function(evt) {
+      this.emit(evt, data);
+    }, this);
   },
-
-  /**
-   * Remove the filter assigned to the specific column.
-   *
-   * @param {string} column
-   */
-  removeFilter: function(column) {
-    delete _filters[column];
-  },
-
-  /**
-   * Remove filters from all columns.
-   */
-  removeAllFilters: function() {
-    _filters = {};
-  }
 });
-
-function loadTestData() {
-  var cities = require('./testdata/cities');
-  _data = cities.data;
-  _schema = cities.schema;
-  _sortColumn = 'population';
-  _sortReversed = true;
-}
-
-loadTestData();
 
 module.exports = DataStore;

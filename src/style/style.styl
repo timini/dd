@@ -8,18 +8,21 @@
     -ms-user-select: none;
     user-select: none;
 
-.content h1, h2, h3, h4, h5
-    font-family 'Lato' sans-serif
-
-.content h1
-    color #50A5C1
-
 .content
     padding-top 30px
     padding-bottom 30px
     width 1200px
     margin 0 auto
     font-family 'Lato'
+
+.row
+    max-width none
+
+h1, h2, h3, h4, h5
+    font-family 'Lato' sans-serif
+
+h1
+    color #50A5C1
 
 td.empty
     background-color #FFECD4
@@ -37,7 +40,7 @@ table thead tr
     .selected-column
         color #50A5C1
 
-table tbody tr:hover
+table tbody tr.highlight
     background-color #DDF
     td
         color darken(#50a5c1, 60%)
@@ -55,8 +58,7 @@ table tbody tr:hover
     margin-right 6px
     margin-bottom 6px
     &.not-available
-        cursor default
-        opacity 0.3;
+        opacity 0.4;
     &.selected
         background-color #50A5C1
         color #fff;
@@ -65,22 +67,3 @@ table tbody tr:hover
         color #333;
     .category-count
         opacity 0.5
-
-.row
-    margin-left 0px
-    margin-right 0px
-    max-width none
-
-.tabletrans-enter
-    opacity: 0.01;
-    transition: opacity .5s ease-in;
-
-.tabletrans-enter.tabletrans-enter-active
-    opacity: 1;
-
-.tabletrans-leave
-  opacity: 1;
-  transition: opacity .5s ease-in;
-
-.tabletrans-leave.tabletrans-leave-active
-  opacity: 0.01;
