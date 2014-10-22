@@ -9,7 +9,7 @@ var ChangeEvent = require('../changeevent');
 var NumberFilter = React.createClass({
 
   propTypes: {
-    key: React.PropTypes.string.isRequired,
+    fieldKey: React.PropTypes.string.isRequired,
   },
 
   getInitialState: function() {
@@ -29,7 +29,8 @@ var NumberFilter = React.createClass({
   },
 
   render: function() {
-    return <Histogram items={this.state.items} key={this.props.key} width={300} height={70} padding={3}/>;
+    return <Histogram items={this.state.items} fieldKey={this.props.fieldKey} 
+      width={300} height={70} padding={3}/>;
   }
 });
 
@@ -37,7 +38,7 @@ var Histogram = React.createClass({
 
   propTypes: {
     items: React.PropTypes.array.isRequired,
-    key: React.PropTypes.string.isRequired,
+    fieldKey: React.PropTypes.string.isRequired,
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number.isRequired,
     padding: React.PropTypes.number,
@@ -45,9 +46,8 @@ var Histogram = React.createClass({
   },
 
   getBins: function() {
-    console.log(this.props.key);
     if (!this.props.items.length) return [];
-    var getValue = R.compose(R.get(this.props.key), R.get('data'));
+    var getValue = R.compose(R.get(this.props.fieldKey), R.get('data'));
     var items = this.props.items;
     var binEdges = this.getBinEdges(
       R.map(getValue, items),
@@ -102,7 +102,7 @@ var Histogram = React.createClass({
           var y = padding/2;
           return (
             <Bar key={i} width={barWidth} height={barHeight} x={x} y={y}
-              bin={bin} largestBinSize={largestBinSize} fieldKey={this.props.key}/>
+              bin={bin} largestBinSize={largestBinSize} fieldKey={this.props.fieldKey}/>
           );
         }, this)}
       </svg>

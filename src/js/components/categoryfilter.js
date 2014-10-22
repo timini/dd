@@ -9,46 +9,27 @@ var ChangeEvent = require('../changeevent');
 var CategoryFilter = React.createClass({
 
   propTypes: {
-    key: React.PropTypes.string.isRequired,
+    fieldKey: React.PropTypes.string.isRequired,
   },
 
   getInitialState: function() {
-    return {items: [], hoveredItem: null};
+    return {items: [], filterDefs: {}};
   },
 
   componentDidMount: function() {
     DataStore.on(ChangeEvent.FILTER, this.onChange);
-    DataStore.on('ITEM_HOVER', this.onItemHover);
   },
 
   componentWillUnmount: function() {
     DataStore.removeListener(ChangeEvent.FILTER, this.onChange);
-    DataStore.removeListener('ITEM_HOVER', this.onItemHover);
   },
 
-  onItemHover: function(item) {
-    this.setState({hoveredItem: item});
-  },
-
-  onChange: function(data) {
-    this.setState(data);
-  },
-
-  getCounts: function() {
-    var counts = {};
-    var key = this.props.key;
-    this.state.items.forEach(function(item) {
-      var category = item.data[key];
-      if (category===null || category===undefined) return;
-      if (!(category in counts)) counts[category] = 0;
-      if (R.difference(item.filtered || [], [key]).length) return;
-      counts[category] += 1;
-    }, this);
-    return counts;
+  onChange: function(state) {
+    this.setState(state);
   },
 
   selectedCategories: function() {
-    var filterDef = this.state.filterDefs[this.props.key];
+    var filterDef = this.state.filterDefs[this.props.fieldKey];
     return filterDef ? filterDef.categories || [] : [];
   },
 
@@ -64,56 +45,120 @@ var CategoryFilter = React.createClass({
     return selected;
   },
 
-  handleClick: function(category) {
+  onClick: function(category) {
     DataStore.updateFilter(
-      this.props.key,
+      this.props.fieldKey,
       {categories: this.toggleSelected(category)}
     );
   },
 
-  handleMouseEnter: function(category) {
-    DataStore.updateHighlight(R.compose(
-        R.eq(category),
-        R.get(this.props.key)
-    ));
-  },
-
-  handleMouseLeave: function() {
-    DataStore.updateHighlight(null);
-  },
-
-  categoryButton: function(category, count, i) {
-    var isHoveredItem = this.state.hoveredItem &&
-      this.state.hoveredItem.data[this.props.key]==category;
-    var boundClick = this.handleClick.bind(this, category);
-    var boundEnter = this.handleMouseEnter.bind(this, category);
-    var className = "category-button";
-    if (this.isSelected(category)) className += " selected";
-    if (!count) className += " not-available";
-    if (isHoveredItem) className += " highlight";
-    return (
-      <span key={i} onClick={boundClick} onMouseEnter={boundEnter} 
-          onMouseLeave={this.handleMouseLeave} className={className}>
-        {category} <span className="category-count">{count}</span>
-      </span>
+  getGroups: function() {
+    return R.groupBy(
+      R.compose(R.get(this.props.fieldKey), R.get('data')),
+      this.state.items
     );
+  },
+
+  getSortOrder: function(groups, counts) {
+    return R.sort(function(category) {
+      return groups[category].count; 
+    }, Object.keys(groups));
+  },
+
+  getCounts: function(groups) {
+    var counts = R.mapObj(R.alwaysZero, groups);
+    var keyArray = [this.props.fieldKey];
+    for (var category in groups) {
+      var items = groups[category];
+      groups[category].forEach(function(item) {
+        if (!item.filtered || !R.difference(item.filtered, keyArray).length)
+          counts[category] += 1;
+      }, this);
+    }
+    return counts;
   },
 
   render: function() {
-    var counts = this.getCounts();
-    // TODO: secondary sort alphabetically
-    var categories = R.sortBy(
-      function(x) { return -counts[x]; },
-      Object.keys(counts)
+    var groups = this.getGroups();
+    var counts = this.getCounts(groups);
+    var order = R.sortBy(
+      function(category) { return -counts[category]; },
+      Object.keys(groups)
     );
     return (
       <div className="category-filter">
-        {categories.map(function(category, i) {
-          return this.categoryButton(category, counts[category], i);
+        {order.map(function(category, i) {
+          var boundClick = this.onClick.bind(this, category);
+          return (
+            <CategoryButton
+              key={i}
+              category={category}
+              fieldKey={this.props.fieldKey}
+              items={groups[category]}
+              selected={this.isSelected(category)}
+              onClick={boundClick}
+              count={counts[category]}
+            />
+          );
         }, this)}
       </div>
     );
   }
 });
+
+var CategoryButton = React.createClass({
+
+  propTypes: {
+    fieldKey: React.PropTypes.string.isRequired,
+    onClick: React.PropTypes.func,
+    selected: React.PropTypes.bool,
+    items: React.PropTypes.array.isRequired,
+    count: React.PropTypes.number.isRequired
+  },
+
+  getInitialState: function() {
+    return {highlight: false};
+  },
+
+  onMouseEnter: function() {
+    DataStore.updateHighlight(R.compose(
+        R.eq(this.props.category),
+        R.get(this.props.fieldKey)
+    ));
+  },
+
+  onItemHover: function(item) {
+    this.setState({hoveredItem: item});
+  },
+
+  componentDidMount: function() {
+    DataStore.on('ITEM_HOVER', this.onItemHover);
+  },
+
+  componentWillUnmount: function() {
+    DataStore.removeListener('ITEM_HOVER', this.onItemHover);
+  },
+
+  onMouseLeave: function() {
+    DataStore.updateHighlight(null);
+  },
+
+  render: function() {
+    isHoveredItem = false;
+    var count = this.props.count;
+    var className = "category-button";
+    if (this.props.selected) className += " selected";
+    if (!count) className += " not-available";
+    if (isHoveredItem) className += " highlight";
+    return (
+      <span onClick={this.props.onClick} onMouseEnter={this.onMouseEnter} 
+          onMouseLeave={this.onMouseLeave} className={className}>
+        {this.props.category}
+        <span className="category-count">{count}</span>
+      </span>
+    );
+  },
+});
+
 
 module.exports = CategoryFilter;
