@@ -37,7 +37,7 @@ var FilterWidget = React.createClass({
         default: return;
       }
       els.push(
-        <div key={i} className="large-6 columns">
+        <div key={i} className="row">
           <h5>{field.name}</h5>
           {el}
         </div>

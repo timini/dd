@@ -4,6 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
+var MetaStore = require('../metastore');
 var ChangeEvent = require('../changeevent');
 
 var CategoryFilter = React.createClass({
@@ -53,10 +54,9 @@ var CategoryFilter = React.createClass({
   },
 
   getGroups: function() {
-    return R.groupBy(
-      R.compose(R.get(this.props.fieldKey), R.get('data')),
-      this.state.items
-    );
+    var getValue = R.compose(R.get(this.props.fieldKey), R.get('data'));
+    var items = this.state.items.filter(getValue);
+    return R.groupBy(getValue, items);
   },
 
   getSortOrder: function(groups, counts) {
@@ -120,41 +120,45 @@ var CategoryButton = React.createClass({
     return {highlight: false};
   },
 
-  onMouseEnter: function() {
-    DataStore.updateHighlight(R.compose(
-        R.eq(this.props.category),
-        R.get(this.props.fieldKey)
-    ));
-  },
-
-  onItemHover: function(item) {
-    this.setState({hoveredItem: item});
-  },
-
   componentDidMount: function() {
-    DataStore.on('ITEM_HOVER', this.onItemHover);
+    MetaStore.addHighlightListener(this.onHighlight);
   },
 
   componentWillUnmount: function() {
-    DataStore.removeListener('ITEM_HOVER', this.onItemHover);
+    MetaStore.removeHighlightListener(this.onHighlight);
+  },
+
+  getIds: function() {
+    return R.map(R.get('id'), this.props.items);
+  },
+
+  onHighlight: function(ids) {
+    var highlight = ids && R.intersection(ids, this.getIds()).length;
+    if (highlight && !this.state.highlight)
+      this.setState({highlight: true});
+    else if (!highlight && this.state.highlight)
+      this.setState({highlight: false});
+  },
+
+  onMouseEnter: function() {
+    MetaStore.updateHighlightIds(this.getIds(), this.props.items);
   },
 
   onMouseLeave: function() {
-    DataStore.updateHighlight(null);
+    MetaStore.updateHighlightIds(null);
   },
 
   render: function() {
-    isHoveredItem = false;
     var count = this.props.count;
     var className = "category-button";
     if (this.props.selected) className += " selected";
     if (!count) className += " not-available";
-    if (isHoveredItem) className += " highlight";
+    if (this.state.highlight) className += " highlight";
     return (
       <span onClick={this.props.onClick} onMouseEnter={this.onMouseEnter} 
           onMouseLeave={this.onMouseLeave} className={className}>
         {this.props.category}
-        <span className="category-count">{count}</span>
+        <span className="category-count"> {count}</span>
       </span>
     );
   },

@@ -4,6 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
+var MetaStore = require('../metastore');
 var ChangeEvent = require('../changeevent');
 
 var Table = React.createClass({
@@ -92,11 +93,11 @@ var TableData = React.createClass({
   },
 
   componentDidMount: function() {
-    DataStore.on(ChangeEvent.HIGHLIGHT, this.onChange);
+    DataStore.on(ChangeEvent.SORT, this.onChange);
   },
 
   componentWillUnmount: function() {
-    DataStore.removeListener(ChangeEvent.HIGHLIGHT, this.onChange);
+    DataStore.removeListener(ChangeEvent.SORT, this.onChange);
   },
 
   onChange: function(data) {
@@ -116,6 +117,10 @@ var TableData = React.createClass({
 
 var Row = React.createClass({
 
+  getInitialState: function() {
+    return {highlight: false}
+  },
+
   propTypes: {
     schema: React.PropTypes.array.isRequired,
     item: React.PropTypes.object.isRequired
@@ -128,20 +133,34 @@ var Row = React.createClass({
       <td key={i}>{val}</td>;
   },
 
+  componentDidMount: function() {
+    MetaStore.addHighlightListener(this.onHighlight);
+  },
+
+  componentWillUnmount: function() {
+    MetaStore.removeHighlightListener(this.onHighlight);
+  },
+
+  onHighlight: function(ids) {
+    var highlight = ids && R.contains(this.props.item.id)(ids)
+    if (highlight && !this.state.highlight)
+      this.setState({highlight: true});
+    else if (!highlight && this.state.highlight)
+      this.setState({highlight: false});
+  },
+
   onMouseEnter: function() {
-    DataStore.updateItemHover(this.props.item);
+    MetaStore.updateHighlightIds([this.props.item.id]);
   },
 
   onMouseLeave: function() {
-    DataStore.updateItemHover(null);
+    MetaStore.updateHighlightIds(null);
   },
 
   render: function() {
     var item = this.props.item;
-    if (item.filtered)
-      var className = "hide";
-    else if (item.highlight)
-      var className = "highlight";
+    if (item.filtered) var className = "hide";
+    else if (this.state.highlight) var className = "highlight";
     return (
       <tr className={className} onMouseEnter={this.onMouseEnter} 
           onMouseLeave={this.onMouseLeave}>

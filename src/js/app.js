@@ -15,7 +15,17 @@ var App = React.createClass({
   },
 
   render: function() {
-    return <div><FilterWidget/><Table/></div>;
+    return (
+      <div className="row collapse">
+        <div className="large-4 columns">
+          <h1>drilldown</h1>
+          <FilterWidget/>
+        </div>
+        <div className="large-8 columns">
+          <Table/>
+        </div>
+      </div>
+    );
   }
 });
 

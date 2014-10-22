@@ -4,6 +4,7 @@ var React = require('react');
 var R = require('ramda');
 
 var DataStore = require('../datastore');
+var MetaStore = require('../metastore');
 var ChangeEvent = require('../changeevent');
 
 var NumberFilter = React.createClass({
@@ -127,36 +128,31 @@ var Bar = React.createClass({
   },
 
   componentDidMount: function() {
-    DataStore.on('ITEM_HOVER', this.onItemHover);
+    MetaStore.addHighlightListener(this.onHighlight);
   },
 
   componentWillUnmount: function() {
-    console.log('unmount');
-    DataStore.removeListener('ITEM_HOVER', this.onItemHover);
+    MetaStore.removeHighlightListener(this.onHighlight);
+  },
+
+  getIds: function() {
+    return R.map(R.get('id'), this.props.bin.items);
+  },
+
+  onHighlight: function(ids) {
+    var highlight = ids && R.intersection(ids, this.getIds()).length;
+    if (highlight && !this.state.highlight)
+      this.setState({highlight: true});
+    else if (!highlight && this.state.highlight)
+      this.setState({highlight: false});
   },
 
   onMouseEnter: function() {
-    var bin = this.props.bin;
-    var key = this.props.fieldKey;
-    DataStore.updateHighlight(
-      R.compose(
-        R.and(R.gt(bin.max), R.lte(bin.min)),
-        R.get(key)
-      )
-    );
-    this.setState({highlight: true})
+    MetaStore.updateHighlightIds(this.getIds(), this.props.items);
   },
 
   onMouseLeave: function() {
-    DataStore.updateHighlight(null);
-    this.setState({highlight: false})
-  },
-
-  onItemHover: function(item) {
-    // TODO: does not work with item copies
-    this.setState({
-      highlight: R.contains(item)(this.props.bin.items)
-    });
+    MetaStore.updateHighlightIds(null);
   },
 
   render: function() {
