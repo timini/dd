@@ -4,7 +4,7 @@ var React = require('react');
 var $ = require('jquery');
 var R = require('ramda');
 
-var DataStore = require('./datastore');
+var DataStore = require('./stores/datastore');
 var Table = require('./components/table');
 var FilterWidget = require('./components/filterwidget');
 
@@ -30,7 +30,7 @@ var App = React.createClass({
 });
 
 function loadTestData() {
-  var cities = require('./testdata/cities');
+  var cities = require('./utils/testdata/cities');
   DataStore.load(cities.schema, cities.items, 'population', true);
 }
 

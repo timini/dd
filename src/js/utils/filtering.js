@@ -1,6 +1,6 @@
 var R = require('ramda');
 
-var DataType = require('./datatype');
+var DataType = require('../consts/datatype');
 
 /**
  * Create filtering functions for particular fields in a schema

@@ -2,9 +2,9 @@
 
 var React = require('react');
 
-var DataType = require('../datatype');
-var DataStore = require('../datastore');
-var ChangeEvent = require('../changeevent');
+var DataStore = require('../stores/datastore');
+var DataType = require('../consts/datatype');
+var ChangeEvent = require('../consts/changeevent');
 var CategoryFilter = require('./categoryfilter');
 var NumberFilter = require('./numberfilter');
 

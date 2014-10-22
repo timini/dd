@@ -2,9 +2,9 @@ var EventEmitter = require('events').EventEmitter;
 var R = require('ramda');
 var merge = require('react/lib/merge');
 
-var DataType = require('./datatype');
-var ChangeEvent = require('./changeevent');
-var filtering = require('./filtering');
+var DataType = require('../consts/datatype');
+var ChangeEvent = require('../consts/changeevent');
+var filtering = require('../utils/filtering');
 
 var ITEM_HOVER = 'ITEM_HOVER';
 

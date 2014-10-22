@@ -1,6 +1,6 @@
 // Test data
 
-var DataType = require('../datatype');
+var DataType = require('../../consts/datatype');
 
 exports.items = [
     {

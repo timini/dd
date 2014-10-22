@@ -3,9 +3,9 @@
 var React = require('react');
 var R = require('ramda');
 
-var DataStore = require('../datastore');
-var MetaStore = require('../metastore');
-var ChangeEvent = require('../changeevent');
+var DataStore = require('../stores/datastore');
+var MetaStore = require('../stores/metastore');
+var ChangeEvent = require('../consts/changeevent');
 
 var NumberFilter = React.createClass({
 
