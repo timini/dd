@@ -6,6 +6,7 @@ var DataType = require('../datatype');
 var DataStore = require('../datastore');
 var ChangeEvent = require('../changeevent');
 var CategoryFilter = require('./categoryfilter');
+var NumberFilter = require('./numberfilter');
 
 var FilterWidget = React.createClass({
 
@@ -31,6 +32,8 @@ var FilterWidget = React.createClass({
       switch (column.datatype) {
         case DataType.CATEGORY:
           var el = <CategoryFilter key={column.key}/>; break;
+        case DataType.NUMBER:
+          var el = <NumberFilter key={column.key}/>; break;
         default: return;
       }
       els.push(

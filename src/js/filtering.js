@@ -28,7 +28,11 @@ function createFilters(schema, filterDefs) {
  */
 function filterItems(items, filters) {
   return items.map(function(item) {
-    return { data: item, filtered: filterItem(item, filters) };
+    return {
+      id: item.id,
+      data: item.data,
+      filtered: filterItem(item, filters)
+    };
   });
 }
 

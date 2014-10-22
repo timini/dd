@@ -41,6 +41,7 @@ function sortItems(items) {
 function getHighlight(items) {
   return items.map(function(item) {
     return {
+      id: item.id,
       data: item.data,
       filtered: item.filtered,
       highlight: highlightFn ? highlightFn(item.data) : false,
@@ -69,7 +70,9 @@ var DataStore = merge(EventEmitter.prototype, {
    */
   load: function(newSchema, newItems, newSortKey, newSortReversed) {
     schema = newSchema;
-    items = newItems;
+    items = newItems.map(function(data, i) {
+      return { id: i, data: data };
+    });
     sortKey = newSortKey || schema[0].key;
     sortReversed = newSortReversed || false;
     this.applyPipeline(ChangeEvent.SCHEMA);
@@ -161,5 +164,7 @@ var DataStore = merge(EventEmitter.prototype, {
     }, this);
   },
 });
+
+DataStore.setMaxListeners(100);
 
 module.exports = DataStore;
