@@ -12,7 +12,7 @@ var db          = require('./src/config/db')
 
 var app = express();
 
-// middlewares must be added in order
+// middlewares must be added in order - start with the basics
 environment(app);
 
 // add models to the request early in the middleware chain
@@ -27,6 +27,7 @@ var db_conn = orm.connect(settings.db, function(err){
     }
 });
 
+// add all the main routes
 app.use(main_router);
 
 app.listen(settings.port);
