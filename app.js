@@ -15,13 +15,12 @@ var app = express();
 // middlewares must be added in order
 environment(app);
 
-models = db.init(db_conn);
-
 // add models to the request early in the middleware chain
 var db_conn = orm.connect(settings.db, function(err){
     if (err) return console.error('DB Connection error: ' + err);
     else{
         app.use(function(req,res,next){
+            models = db.init(db_conn);
             req.models = models;
             next();
         });
