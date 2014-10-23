@@ -39,4 +39,4 @@ gulp.task('watch', function() {
     gulp.watch(paths.js, ['js']);
 });
 
-gulp.task('default', ['watch', 'css', 'js']);
+gulp.task('default', ['css', 'js', 'watch']);

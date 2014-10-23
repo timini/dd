@@ -1,62 +1,16 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var express     = require('express');
+var path        = require('path');
 
-var routes = require('./src/routes/index');
-var users = require('./src/routes/users');
+BASE = function(p) { return path.join(__dirname, p); };
+
+var settings    = require('./src/config/settings');
+var routes      = require('./src/config/routes');
+var environment = require('./src/config/environment');
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'src/views'));
-app.set('view engine', 'jade');
+environment(app);
+routes(app);
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use('/js', express.static(path.join(__dirname, 'build/js')));
-app.use('/css', express.static(path.join(__dirname, 'build/css')));
-app.use('/resources', express.static(path.join(__dirname, 'resources')));
-// uncomment after placing your favicon in /resources
-//app.use(favicon(__dirname + '/resorces/favicon.ico'));
-
-app.use('/', routes);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
-
-module.exports = app;
+app.listen(settings.port);
+console.log('Server started... listening on port' + settings.port)
