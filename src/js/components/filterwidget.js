@@ -6,6 +6,7 @@ var DataType = require('../datatype');
 var DataStore = require('../datastore');
 var ChangeEvent = require('../changeevent');
 var CategoryFilter = require('./categoryfilter');
+var NumberFilter = require('./numberfilter');
 
 var FilterWidget = React.createClass({
 
@@ -27,15 +28,17 @@ var FilterWidget = React.createClass({
 
   render: function() {
     var els = [];
-    this.state.schema.forEach(function(column, i) {
-      switch (column.datatype) {
+    this.state.schema.forEach(function(field, i) {
+      switch (field.datatype) {
         case DataType.CATEGORY:
-          var el = <CategoryFilter key={column.key}/>; break;
+          var el = <CategoryFilter fieldKey={field.key}/>; break;
+        case DataType.NUMBER:
+          var el = <NumberFilter fieldKey={field.key}/>; break;
         default: return;
       }
       els.push(
-        <div key={i} className="large-6 columns">
-          <h5>{column.name}</h5>
+        <div key={i} className="row">
+          <h5>{field.name}</h5>
           {el}
         </div>
       );

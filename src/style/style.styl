@@ -44,15 +44,10 @@ table tbody tr.highlight
     td
         color darken(#50a5c1, 60%)
 
-table tbody tr:hover
-    background-color #DDF
-    td
-        color darken(#50a5c1, 60%)
-
 .category-button
     @extend .no-select
     cursor pointer
-    font-size 0.8em
+    font-size 0.75em
     margin 2px
     padding 2px 6px
     background-color #F6F6F6;
@@ -66,11 +61,18 @@ table tbody tr:hover
     &.selected
         background-color #50A5C1
         color #fff;
-    &:hover:not(.selected):not(.not-available)
-        background-color #DDF
-        color #333;
     .category-count
         opacity 0.5
     &.highlight
         background-color #DDF
         color #333;
+
+.histogram
+    rect
+        fill darken(#F6F6F6, 0%);
+        stroke: #AAA;
+    rect.empty
+        fill-opacity 0
+        stroke-opacity 0
+    rect.highlight
+        fill #DDF

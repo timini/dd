@@ -28,7 +28,11 @@ function createFilters(schema, filterDefs) {
  */
 function filterItems(items, filters) {
   return items.map(function(item) {
-    return { data: item, filtered: filterItem(item, filters) };
+    return {
+      id: item.id,
+      data: item.data,
+      filtered: filterItem(item, filters)
+    };
   });
 }
 
@@ -44,9 +48,10 @@ function filterItem(item, filters) {
   var filtered = [];
   var result, filter;
   for (var key in filters) {
+    var value = item.data[key];
     filter = filters[key];
     if (filter===null || filter===undefined) continue;
-    if(typeof filter==='function' ? !filter(item[key]) : item[key]!==filter)
+    if(typeof filter==='function' ? !filter(value) : value!==filter)
       filtered.push(key)
   }
   return filtered.length ? filtered : null;
