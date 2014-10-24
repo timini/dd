@@ -1,10 +1,18 @@
-var gulp = require('gulp');
+var gulp        = require('gulp');
 
-var browserify = require('browserify');
-var del = require('del');
-var reactify = require('reactify');
-var source = require('vinyl-source-stream');
-var stylus = require('gulp-stylus');
+var browserify  = require('browserify');
+var del         = require('del');
+var reactify    = require('reactify');
+var source      = require('vinyl-source-stream');
+var stylus      = require('gulp-stylus');
+var orm         = require('orm');
+var path        = require('path');
+
+// naughty global for making non-relative imports
+BASE = function(p) { return path.join(__dirname, p); };
+
+var db          = require('./src/config/db')
+var settings    = require('./src/config/settings');
 
 var paths = {
     style: ['./src/style/*.styl'],
@@ -32,6 +40,16 @@ gulp.task('js', ['clean-js'], function() {
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest('./build/js/'));
+});
+
+gulp.task('syncdb', function(){
+    var db_conn = orm.connect(settings.db, function(err){
+        if (err) return console.log('DB connection error' + err);
+        else{
+            models = db.init(db_conn);
+            db.sync(models);
+        }
+    });
 });
 
 gulp.task('watch', function() {

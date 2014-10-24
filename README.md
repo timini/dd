@@ -12,7 +12,17 @@ To run build tasks you will also need to install gulp globally:
 npm install gulp -g
 ```
 
+## Config
+
+Edit the database settings in /src/config/settings
+
 ## Build
+
+Create the database tables:
+
+```
+gulp syncdb
+```
 
 Watch for changes and build automatically by running the default task:
 
