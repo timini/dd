@@ -14,3 +14,7 @@
 * chisel.io
 * fondu.io
 * mangetout.io
+* magpie.io
+* gridsift.io
+* squirrl.io
+* griddle.io
