@@ -2,46 +2,33 @@
 
 ## Installation
 
-```
-npm install
-```
+    npm install
 
 To run build tasks you will also need to install gulp globally:
 
-```
-npm install gulp -g
-```
+    npm install gulp -g
 
-## Config
+Initialise the database:
 
-Edit the database settings in /src/config/settings
+    createdb drilldown
+    gulp syncdb
+
+Edit the database settings in `src/config/settings.js`.
 
 ## Build
 
-Create the database tables:
-
-```
-gulp syncdb
-```
-
 Watch for changes and build automatically by running the default task:
 
-```
-gulp
-```
+    gulp
 
 ## Run
 
 The default port is 3000:
 
-```
-npm start
-```
+    npm start
 
 ## JSON Test urls
 
-```
-https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/1/public/values?alt=json
-https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/2/public/values?alt=json
-https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/3/public/values?alt=json
-```
+    https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/1/public/values?alt=json
+    https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/2/public/values?alt=json
+    https://spreadsheets.google.com/feeds/list/11Z-0vnbFkl-JeoEGmoe5boUKob9XiuzWJI8KHXpCFEs/3/public/values?alt=json
