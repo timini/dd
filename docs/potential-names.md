@@ -18,3 +18,4 @@
 * gridsift.io
 * squirrl.io
 * griddle.io
+* filterbox.io

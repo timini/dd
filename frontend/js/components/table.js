@@ -7,6 +7,8 @@ var DataStore = require('../stores/datastore');
 var MetaStore = require('../stores/metastore');
 var ChangeEvent = require('../consts/changeevent');
 
+//-----------------------------------------------------------------------------
+
 var Table = React.createClass({
 
   render: function() {
@@ -23,8 +25,9 @@ var TableHeader = React.createClass({
 
   getInitialState: function() {
     return {
+      schema: {},
+      displayed: [],
       sortKey: null,
-      schema: [],
       reversedColumns: []
     };
   },
@@ -67,20 +70,25 @@ var TableHeader = React.createClass({
     DataStore.updateSortMethod(column, columnIsReversed);
   },
 
+  createCell: function(field, i) {
+    var key = field.key;
+    var boundClick = this.handleClick.bind(this, key);
+    var tableClass = 'table-head' + 
+      (this.columnIsSelected(key) ? ' selected-column' : '');
+    var arrowClass = "fa " +
+      (this.columnIsReversed(key) ? 'fa-arrow-down' : 'fa-arrow-up');
+    return (
+      <th key={i} onClick={boundClick}>
+        <div className={tableClass}>
+          {field.name}<i className={arrowClass}/>
+        </div>
+      </th>
+    );
+  },
+
   render: function() {
-    var row = this.state.schema.map(function(column, i) {
-      var boundClick = this.handleClick.bind(this, column.key);
-      var tableClass = 'table-head' + 
-        (this.columnIsSelected(column.key) ? ' selected-column' : '');
-      var arrowClass = "fa " +
-        (this.columnIsReversed(column.key) ? 'fa-arrow-down' : 'fa-arrow-up');
-      return (
-        <th key={i} onClick={boundClick}>
-          <div className={tableClass}>
-            {column.name}<i className={arrowClass}/>
-          </div>
-        </th>
-      );
+    var row = this.state.displayed.map(function(key, i) {
+      return this.createCell(this.state.schema[key], i);
     }, this);
     return <thead><tr>{row}</tr></thead>;
   }
@@ -89,7 +97,10 @@ var TableHeader = React.createClass({
 var TableData = React.createClass({
 
   getInitialState: function() {
-    return {items: [], schema: []};
+    return {
+      items: [],
+      displayed: []
+    };
   },
 
   componentDidMount: function() {
@@ -108,7 +119,13 @@ var TableData = React.createClass({
     return (
       <tbody>
         {this.state.items.map(function(item, i) {
-          return <Row key={i} schema={this.state.schema} item={item}/>;
+          return (
+            <Row
+              key={i}
+              displayed={this.state.displayed}
+              item={item}
+            />
+          );
         }, this)}
       </tbody>
     );
@@ -118,19 +135,11 @@ var TableData = React.createClass({
 var Row = React.createClass({
 
   getInitialState: function() {
-    return {highlight: false}
+    return { highlight: false };
   },
 
   propTypes: {
-    schema: React.PropTypes.array.isRequired,
     item: React.PropTypes.object.isRequired
-  },
-
-  renderCell: function(field, i) {
-    var val = this.props.item.data[field.key];
-    return (val===undefined || val===null) ?
-      <td key={i} className="empty">no data</td> :
-      <td key={i}>{val}</td>;
   },
 
   componentDidMount: function() {
@@ -157,6 +166,13 @@ var Row = React.createClass({
     MetaStore.updateHighlightIds(null);
   },
 
+  renderCell: function(key, i) {
+    var val = this.props.item.data[key];
+    return (val===undefined || val===null) ?
+      <td key={i} className="empty">no data</td> :
+      <td key={i}>{val}</td>;
+  },
+
   render: function() {
     var item = this.props.item;
     if (item.filtered) var className = "hide";
@@ -164,8 +180,8 @@ var Row = React.createClass({
     return (
       <tr className={className} onMouseEnter={this.onMouseEnter} 
           onMouseLeave={this.onMouseLeave}>
-        {this.props.schema.map(function(field, i) {
-          return this.renderCell(field, i);
+        {this.props.displayed.map(function(key, i) {
+          return this.renderCell(key, i);
         }, this)}
       </tr>
     );

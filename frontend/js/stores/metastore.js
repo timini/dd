@@ -3,6 +3,8 @@ var R = require('ramda');
 var merge = require('react/lib/merge');
 var keyMirror = require('react/lib/keyMirror');
 
+//-----------------------------------------------------------------------------
+
 var MetaEvents = keyMirror({
   HIGHLIGHT: null
 });

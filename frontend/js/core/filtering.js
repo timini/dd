@@ -2,6 +2,8 @@ var R = require('ramda');
 
 var DataType = require('../consts/datatype');
 
+//-----------------------------------------------------------------------------
+
 /**
  * Create filtering functions for particular fields in a schema
  *
@@ -10,13 +12,13 @@ var DataType = require('../consts/datatype');
  *  arguments used to initialise the filter function. The type of filter
  *  function returned is dependent on the datatype for the field.
  */
-function createFilters(schema, filterDefs) {
-  filters = {};
-  for (var key in filterDefs) {
-    var field = R.find(R.where({key: key}), schema);
-    filters[key] = createFilter(field.datatype, filterDefs[key]);
-  }
-  return filters;
+function createFilters(filterDefs, schema) {
+  return R.mapObj.idx(
+    function(filterDef, key) {
+      return createFilter(schema[key].datatype, filterDef);
+    },
+    filterDefs
+  );
 }
 
 /**
@@ -75,6 +77,11 @@ function createFilter(datatype, filterDef) {
   }
 }
 
+/**
+ * Create a filter from a finite set of categories.
+ *
+ * @param {array} categories Permitted categories. If empty, allow any.
+ */
 function createCategoryFilter(categories) {
   categories = categories || [];
   if (categories.length)
@@ -84,6 +91,12 @@ function createCategoryFilter(categories) {
   else return null;
 }
 
+/**
+ * Create a filter for a numeric range
+ *
+ * @param {number} min The minimum permitted value
+ * @param {number} max The maximum permitted value
+ */
 function createRangeFilter(min, max) {
     return R.and(R.gte(max), R.lte(min))
 }

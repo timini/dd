@@ -8,10 +8,12 @@ var ChangeEvent = require('../consts/changeevent');
 var CategoryFilter = require('./categoryfilter');
 var NumberFilter = require('./numberfilter');
 
-var FilterWidget = React.createClass({
+//-----------------------------------------------------------------------------
+
+var FilterBox = React.createClass({
 
   getInitialState: function() {
-    return {schema: [], items: []}
+    return { displayed: [], schema: {} };
   },
 
   componentDidMount: function() {
@@ -28,12 +30,13 @@ var FilterWidget = React.createClass({
 
   render: function() {
     var els = [];
-    this.state.schema.forEach(function(field, i) {
+    this.state.displayed.forEach(function(key, i) {
+      var field = this.state.schema[key];
       switch (field.datatype) {
         case DataType.CATEGORY:
-          var el = <CategoryFilter fieldKey={field.key}/>; break;
+          var el = <CategoryFilter fieldKey={key}/>; break;
         case DataType.NUMBER:
-          var el = <NumberFilter fieldKey={field.key}/>; break;
+          var el = <NumberFilter fieldKey={key}/>; break;
         default: return;
       }
       els.push(
@@ -42,9 +45,9 @@ var FilterWidget = React.createClass({
           {el}
         </div>
       );
-    });
+    }, this);
     return <div className="row collapse">{els}</div>;
   },
 });
 
-module.exports = FilterWidget;
+module.exports = FilterBox;

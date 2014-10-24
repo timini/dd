@@ -1,40 +1,21 @@
 var EventEmitter = require('events').EventEmitter;
-var R = require('ramda');
 var merge = require('react/lib/merge');
+var R = require('ramda');
 
-var DataType = require('../consts/datatype');
 var ChangeEvent = require('../consts/changeevent');
-var filtering = require('../utils/filtering');
+var filtering = require('../core/filtering');
+var sorting = require('../core/sorting');
 
-var ITEM_HOVER = 'ITEM_HOVER';
+//-----------------------------------------------------------------------------
 
 var items = [];
-var schema = [];
+var schema = {};
+var displayed = [] // Array of displayed field keys in order to display
 var filters = {};
-var sortKey = null;
+var sortKey = null; // Key of field to sort items by
 var sortReversed = false;
 var filterDefs = {};
-
 var cache = {};
-
-
-/**
- * Sort the data set. Empty values are always placed at the end.
- */
-function sortItems(items) {
-  var column = R.find(R.where({key: sortKey}), schema);
-  if (!column) return items;
-  var getColumn = R.compose(R.get(column.key), R.get("data"));
-  var sort = R.sortBy(R.compose(
-    column.datatype===DataType.NUMBER ? parseFloat : R.toLowerCase,
-    getColumn
-  ));
-  if (sortReversed) sort = R.compose(R.reverse, sort);
-  var isEmpty = function(x) { return x===null || x===undefined };
-  items = R.partition(R.compose(isEmpty, getColumn), items);
-  var empty = items[0], items = items[1];
-  return R.concat(sort(items), empty);
-}
 
 var DataStore = merge(EventEmitter.prototype, {
 
@@ -46,6 +27,7 @@ var DataStore = merge(EventEmitter.prototype, {
    */
   eventHierarchy: [
     ChangeEvent.SCHEMA,
+    ChangeEvent.FIELDS,
     ChangeEvent.DATA,
     ChangeEvent.FILTER,
     ChangeEvent.SORT,
@@ -54,12 +36,14 @@ var DataStore = merge(EventEmitter.prototype, {
   /**
    * Initialised new a data-set.
    */
-  load: function(newSchema, newItems, newSortKey, newSortReversed) {
+  load: function(newSchema, newItems, newDisplayed, newSortKey, 
+      newSortReversed) {
     schema = newSchema;
+    displayed = newDisplayed;
     items = newItems.map(function(data, i) {
       return { id: i, data: data };
     });
-    sortKey = newSortKey || schema[0].key;
+    sortKey = newSortKey || fields[0] || null;
     sortReversed = newSortReversed || false;
     this.applyPipeline(ChangeEvent.SCHEMA);
   },
@@ -100,10 +84,11 @@ var DataStore = merge(EventEmitter.prototype, {
       case DATA:
         null; // Do nothing and continue
       case FILTER:
-        var filters = filtering.createFilters(schema, filterDefs);
+        var filters = filtering.createFilters(filterDefs, schema);
         cache[FILTER] = filtering.filterItems(items, filters);
       case SORT:
-        cache[SORT] = sortItems(cache[FILTER]);
+        cache[SORT] = sorting.sortItems(cache[FILTER], schema, sortKey, 
+            sortReversed);
     }
     this.emitChange(evt);
   },
@@ -112,10 +97,11 @@ var DataStore = merge(EventEmitter.prototype, {
    * Retrieve the data (should not be called directly, will be received by
    * registered listeners upon event propagation)
    */
-  _getData: function() {
+  getData: function() {
     var pipelineEnd = this.eventHierarchy[this.eventHierarchy.length-1];
     return {
       schema: schema,
+      displayed: displayed,
       items: cache[pipelineEnd],
       sortKey: sortKey,
       sortReversed: sortReversed,
@@ -127,7 +113,7 @@ var DataStore = merge(EventEmitter.prototype, {
    * Emit change event to all listeners. This should not be called directly.
    */
   emitChange: function(evt) {
-    var data = this._getData();
+    var data = this.getData();
     var idx = R.findIndex(R.eq(evt), this.eventHierarchy);
     this.eventHierarchy.slice(idx).forEach(function(evt) {
       this.emit(evt, data);

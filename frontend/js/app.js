@@ -6,7 +6,9 @@ var R = require('ramda');
 
 var DataStore = require('./stores/datastore');
 var Table = require('./components/table');
-var FilterWidget = require('./components/filterwidget');
+var FilterBox = require('./components/filterbox');
+
+//-----------------------------------------------------------------------------
 
 var App = React.createClass({
 
@@ -19,7 +21,7 @@ var App = React.createClass({
       <div className="row collapse">
         <div className="large-4 columns">
           <h1>drilldown</h1>
-          <FilterWidget/>
+          <FilterBox/>
         </div>
         <div className="large-8 columns">
           <Table/>
@@ -31,7 +33,8 @@ var App = React.createClass({
 
 function loadTestData() {
   var cities = require('./utils/testdata/cities');
-  DataStore.load(cities.schema, cities.items, 'population', true);
+  DataStore.load(cities.schema, cities.items, cities.displayed, 
+      'population', true);
 }
 
 loadTestData();

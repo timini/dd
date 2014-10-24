@@ -7,6 +7,8 @@ var DataStore = require('../stores/datastore');
 var MetaStore = require('../stores/metastore');
 var ChangeEvent = require('../consts/changeevent');
 
+//-----------------------------------------------------------------------------
+
 var NumberFilter = React.createClass({
 
   propTypes: {
