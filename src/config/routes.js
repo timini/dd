@@ -13,5 +13,5 @@ module.exports = function(app){
     app.use('/js'                   , express.static(BASE('build/js')));
     app.use('/css'                  , express.static(BASE('build/css')));
     app.use('/resources'            , express.static(BASE('resources')));
-    app.use(favicon(BASE('/resources/favicon.ico')));
+    //app.use(favicon(BASE('/resources/favicon.ico')));
 };
