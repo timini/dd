@@ -2,9 +2,6 @@ var express = require('express');
 var path = require('path');
 var orm = require('orm');
 
-// naughty global for making non-relative imports
-BASE = function(p) { return path.join(__dirname, p); };
-
 var settings = require('./src/config/settings');
 var mainRouter = require('./src/config/routes');
 var environment = require('./src/config/environment');
