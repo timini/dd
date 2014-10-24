@@ -8,13 +8,13 @@ var stylus = require('gulp-stylus');
 var orm = require('orm');
 var path = require('path');
 
-var db = require('./src/backend/config/db')
-var settings = require('./src/backend/config/settings');
+var db = require('./backend/config/db')
+var settings = require('./backend/config/settings');
 
 var paths = {
-  style: ['./src/frontend/style/*.styl'],
-  jsApp: ['./src/frontend/js/app.js'],
-  js: ['./src/frontend/js/**/*.js'],
+  style: ['./frontend/style/*.styl'],
+  jsApp: ['./frontend/js/app.js'],
+  js: ['./frontend/js/**/*.js'],
 };
 
 gulp.task('clean-js', function(cb) {
