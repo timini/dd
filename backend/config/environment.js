@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 
 module.exports = function(app){
-  app.set('views', './src/backend/views');
+  app.set('views', './backend/views');
   app.set('view engine', 'jade');
 
   app.use(logger('dev'));

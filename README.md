@@ -13,8 +13,6 @@ Initialise the database:
     createdb drilldown
     gulp syncdb
 
-Edit the database settings in `src/config/settings.js`.
-
 ## Build
 
 Watch for changes and build automatically by running the default task:
