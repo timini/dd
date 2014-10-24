@@ -2,10 +2,10 @@ var express = require('express');
 var path = require('path');
 var orm = require('orm');
 
-var settings = require('./backend/config/settings');
-var mainRouter = require('./backend/config/routes');
-var environment = require('./backend/config/environment');
-var db = require('./backend/config/db')
+var settings = require('./config/settings');
+var mainRouter = require('./config/routes');
+var environment = require('./config/environment');
+var db = require('./config/db')
 
 var app = express();
 
