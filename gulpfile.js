@@ -49,6 +49,11 @@ gulp.task('syncdb', function() {
   });
 });
 
+gulp.task('runserver', function(){
+  // - should watch for changes and push them
+  // - run the server
+});
+
 gulp.task('watch', function() {
   gulp.watch(paths.style, ['css']);
   gulp.watch(paths.js, ['js']);

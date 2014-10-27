@@ -1,8 +1,4 @@
-module.exports = {
-  list: function(req,res,next){
-    next();
-  },
-  get: function(req,res,next){
-    next();
-  }
-}
+var rest = require('./rest');
+var models = require('../models')
+
+module.exports = rest(models.product);
