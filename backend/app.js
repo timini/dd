@@ -16,16 +16,17 @@ environment(app);
 var dbConn = orm.connect(settings.db, function(err){
   if (err) return console.error('DB Connection error: ' + err);
   else{
+    models = db.init(dbConn);
     app.use(function(req,res,next){
-      models = db.init(dbConn);
       req.models = models;
       next();
     });
+    // add all the main routes
+    app.use(mainRouter);
   }
 });
 
-// add all the main routes
-app.use(mainRouter);
-
 app.listen(settings.port);
-console.log('Server started... listening on port' + settings.port)
+console.log('Server started... listening on port ' + settings.port)
+
+module.exports = app;

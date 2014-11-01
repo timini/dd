@@ -5,7 +5,7 @@ module.exports = function(model){
     var router = express.Router()
     // CREATE -----------
     router.post(function(req, res, next){
-        // create ned productlist
+        // create new product
         next()
     })
     // READ -------------

@@ -3,10 +3,8 @@ R = require('ramda');
 models = require('../models');
 
 module.exports.init = function(dbConn){
-  return R.mapObj(
-    function(model) { return model(dbConn); },
-    models
-  );
+  var build_model = function(model) { return model(dbConn); }
+  return R.mapObj(build_model, models);
 }
 
 module.exports.sync = function(models){

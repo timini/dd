@@ -8,9 +8,10 @@ var router = express.Router();
 var rootPath = path.dirname(require.main.filename) + '/../';
 
 router.get('/', controllers.home);
-router.get('/user/login', controllers.users.login);
-router.get('/user/logout', controllers.users.logout);
-router.post('/user/create', controllers.users.create);
+router.post('/echo', controllers.echo);
+router.get('/users/login', controllers.users.login);
+router.get('/users/logout', controllers.users.logout);
+router.post('/users/create', controllers.users.create);
 router.use('/products', controllers.products);
 router.use('/js', express.static(rootPath + 'build/js'));
 router.use('/css', express.static(rootPath + 'build/css'));

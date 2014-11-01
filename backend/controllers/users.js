@@ -6,6 +6,10 @@ module.exports = {
     next();
   },
   create:function(req,res,next){
-    next();
-  }
+    req.models.User.create(req.body, function(err,obj){
+        if (err) { next(err) }
+        res.json(obj);
+        next()
+    });
+  },
 }

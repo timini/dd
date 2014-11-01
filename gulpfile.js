@@ -7,6 +7,8 @@ var source = require('vinyl-source-stream');
 var stylus = require('gulp-stylus');
 var orm = require('orm');
 var path = require('path');
+var mocha = require('gulp-mocha');
+var server = require('gulp-express');
 
 var db = require('./backend/config/db')
 var settings = require('./backend/config/settings');
@@ -40,18 +42,31 @@ gulp.task('js', ['clean-js'], function() {
 });
 
 gulp.task('syncdb', function() {
-  var dbConn = orm.connect(settings.db, function(err){
+  orm.connect(settings.db, function(err, dbConn){
     if (err) return console.log('DB connection error' + err);
     else {
       models = db.init(dbConn);
-      db.sync(models);
+      dbConn.drop(function(){ 
+        console.log('existing tables dropped')
+        db.sync(models);
+      });
     }
   });
 });
 
-gulp.task('runserver', function(){
-  // - should watch for changes and push them
-  // - run the server
+gulp.task('runserver', ['watch'], function(){
+  server.run({
+    file:'backend/app.js',
+    env:'development',
+  })
+  //restart the server when file changes
+  gulp.watch(paths.style, server.notify);
+  gulp.watch(paths.js, server.notify);
+});
+
+gulp.task('test', function(){
+  return gulp.src('test/*.js', {read:false})
+    .pipe(mocha({reporter: 'spec'}));
 });
 
 gulp.task('watch', function() {
