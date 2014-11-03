@@ -39,15 +39,14 @@ describe('Authentication API', function(){
             firstName : 'Jim',
             lastName : 'Creek',
         }
-        request(app.app)
+        request(app)
             .post('/users/create')
             .send(params)
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function(err, res){
                 if(err){
-                    console.log('error from app')
-                    throw err
+                    done(err)
                 }
                 console.log(res.body)
                 res.body.should.have.property('id')
