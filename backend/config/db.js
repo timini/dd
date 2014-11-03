@@ -7,7 +7,7 @@ module.exports.init = function(dbConn){
   return R.mapObj(build_model, models);
 }
 
-module.exports.sync = function(models){
+module.exports.sync = function(models, cb){
   for (var model in models){
     console.log('syncing ' + model);
     models[model].sync(function(err){

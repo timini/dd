@@ -4,8 +4,9 @@ module.exports = function(db) {
     {
       email     : String,
       password  : String,
-      firstname : String,
-      lastname  : String,
+      username  : String,
+      firstName : String,
+      lastName  : String,
       karma     : Number,
       varna     : ['shudra','vasishya','kshatriya','brahmin'],
     },
