@@ -5,7 +5,7 @@ RUN mkdir /nodejs && curl http://nodejs.org/dist/v0.10.32/node-v0.10.32-linux-x6
 RUN apt-get install -y postgresql
 
 USER postgres
-RUN /etc/init.d/postgresql start && createuser drilldown -S -D -R && createdb --owner=drilldown --port=5432 drilldown
+RUN /etc/init.d/postgresql start && createuser drilldown -S -D -R && createdb --owner=drilldown --port=5432 drilldown && createdb --owner=drilldown --port=5432 drilldown-testing
 
 USER root
 ENV PATH $PATH:/nodejs/bin
