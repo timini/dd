@@ -1,5 +1,6 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var bCrypt = require('bcrypt');
 
 var isValidPassword = function(user, password){
   return bCrypt.compareSync(password, user.password);
@@ -33,12 +34,12 @@ module.exports = function(models){
     },
     function(req, username, password, done) {
       findOrCreateUser = function(){
-        models.User.find({username:username},function(err, user) {
+        models.User.find({username:username},function(err, matches) {
           if (err){
             console.log('Error in SignUp: '+err);
             return done(err);
           }
-          if (user) {
+          if (matches.length > 0) {
             console.log('User already exists');
             return done(null, false);
           } else {
@@ -51,6 +52,7 @@ module.exports = function(models){
             }
             models.User.create(userData, function(err,obj){
                if (err) { throw err; }
+               console.log('user created '+ obj)
                return done(null, obj);
             });
           }
@@ -61,6 +63,14 @@ module.exports = function(models){
       process.nextTick(findOrCreateUser);
     }
   ));
+  passport.serializeUser(function(user, done) {
+      console.log(user)
+        done(null, user);
+  });
+
+  passport.deserializeUser(function(user, done) {
+        done(null, user);
+  });
 
   return passport;
 }
