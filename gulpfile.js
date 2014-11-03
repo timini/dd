@@ -45,11 +45,10 @@ gulp.task('syncdb', function() {
   orm.connect(settings.db, function(err, dbConn){
     if (err) return console.log('DB connection error' + err);
     else {
-      console.log(0)
       models = db.init(dbConn);
       dbConn.drop(function(){ 
         console.log('existing tables dropped')
-        db.sync(models, function(){ console.log('complete') });
+        db.sync(models, function(){ console.log('done') });
       });
     }
   });
