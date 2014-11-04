@@ -33,6 +33,7 @@ module.exports = function(models){
       passReqToCallback : true
     },
     function(req, username, password, done) {
+      console.log(req)
       findOrCreateUser = function(){
         models.User.find({username:username},function(err, matches) {
           if (err){
@@ -52,20 +53,19 @@ module.exports = function(models){
             }
             models.User.create(userData, function(err,obj){
                if (err) { throw err; }
-               console.log('user created '+ obj)
                return done(null, obj);
             });
           }
         });
       }
-      // Delay the execution of findOrCreateUser and execute 
+      // Delay the execution of findOrCreateUser and execute
       // the method in the next tick of the event loop
       process.nextTick(findOrCreateUser);
     }
   ));
   passport.serializeUser(function(user, done) {
-      console.log(user)
-        done(null, user);
+      debugger
+      done(null, user);
   });
 
   passport.deserializeUser(function(user, done) {
