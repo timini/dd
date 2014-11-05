@@ -50,7 +50,7 @@ describe('Authentication API', function(){
       }
       //console.log(res.body)
       res.body.should.have.property('id')
-      res.body.firstName.should.equal(params.firstName)
+      res.body.should.not.have.property('password')
       res.body.email.should.equal(params.email)
       done()
     })

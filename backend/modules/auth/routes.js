@@ -13,7 +13,12 @@ module.exports = function(passport){
   /* GET Registration Page */
   /* Handle Registration POST */
   router.post('/create', passport.authenticate('register'),  function(req, res) {
-    res.json(req.user);
+    data = {
+      username: req.user.username,
+      id: req.user.id,
+      email: req.user.email
+    }
+    res.json(data);
   });
 
   return router;

@@ -10,8 +10,7 @@ module.exports.init = function(dbConn){
 
 var syncModel = function(model, cb){
   model.sync(function(err){
-    if (err) console.log('error syncing ' + model);
-    else console.log('syncing complete for ' + model);
+    if (err) console.log('error syncing ');
     cb()
   });
 }
