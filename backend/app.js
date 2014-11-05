@@ -35,9 +35,9 @@ module.exports = function(cb){
       app.use(mainRouter);
 
       cb({
-        dbConn: dbConn,
-        app: app,
-        models: models
+          dbConn: dbConn,
+          app: app,
+          models: models
       });
     }
   });

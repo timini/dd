@@ -1,4 +1,5 @@
 R = require('ramda');
+async = require("async");
 
 models = require('../models');
 
@@ -16,12 +17,13 @@ var syncModel = function(model, cb){
 }
 
 module.exports.sync = function(models, cb){
-  Object.keys(models).forEach(function(key){
-    console.log('syncing ' + key);
-    models[key].sync(function(err){
-      if (err) console.log('error syncing ' + key);
-      else console.log('syncing complete for ' + key);
-    });
-  });
-  cb()
+    async.eachSeries(Object.keys(models), function(key, callback){
+        console.log('syncing ' + key)
+        syncModel(models[key], callback)
+    }, function(err){
+        if (err){ throw err }
+        console.log('syncing complete')
+        cb()
+    })
+
 }

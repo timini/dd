@@ -62,6 +62,7 @@ module.exports = function(models){
       process.nextTick(findOrCreateUser);
     }
   ));
+  
   passport.serializeUser(function(user, done) {
       done(null, user.id);
   });
