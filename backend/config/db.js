@@ -17,9 +17,10 @@ var syncModel = function(model, cb){
 
 module.exports.sync = function(models, cb){
   Object.keys(models).forEach(function(key){
+    console.log('syncing ' + key);
     models[key].sync(function(err){
-      if (err) console.log('error syncing ' + model);
-      else console.log('syncing complete for ' + model);
+      if (err) console.log('error syncing ' + key);
+      else console.log('syncing complete for ' + key);
     });
   });
   cb()

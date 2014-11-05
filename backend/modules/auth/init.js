@@ -33,7 +33,6 @@ module.exports = function(models){
       passReqToCallback : true
     },
     function(req, username, password, done) {
-      console.log(req)
       findOrCreateUser = function(){
         models.User.find({username:username},function(err, matches) {
           if (err){
@@ -64,8 +63,7 @@ module.exports = function(models){
     }
   ));
   passport.serializeUser(function(user, done) {
-      debugger
-      done(null, user);
+      done(null, user.id);
   });
 
   passport.deserializeUser(function(user, done) {

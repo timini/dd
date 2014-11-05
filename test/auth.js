@@ -48,9 +48,9 @@ describe('Authentication API', function(){
       if(err){
         done(err)
       }
-      console.log(res.body)
+      //console.log(res.body)
       res.body.should.have.property('id')
-      res.body.firstname.should.equal('')
+      res.body.firstName.should.equal(params.firstName)
       res.body.email.should.equal(params.email)
       done()
     })
