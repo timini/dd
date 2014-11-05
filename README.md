@@ -10,8 +10,9 @@ To run build tasks you will also need to install gulp globally:
 
 Initialise the database:
 
-    createdb drilldown
     gulp syncdb
+
+More clues on installation can be found in ./server/Dockerfile
 
 ## Build
 
@@ -24,6 +25,10 @@ Watch for changes and build automatically by running the default task:
 The default port is 3000:
 
     npm start
+
+## Test
+
+    npm test
 
 ## JSON Test urls
 
